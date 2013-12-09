@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using engine.entities;
 
@@ -42,6 +43,29 @@ namespace engine
 
     public static class GameWorldFactory
     {
+        public static GameWorld BuildCube()
+        {
+            var d = new List<float> {-0.5f, 0.5f};
+            return new GameWorld
+            {
+                Entities = d.SelectMany(
+                    x => d.SelectMany(
+                    y => d.Select(
+                    z => (Entity)new Cube(new Vector3(x, y, z), Quaternion.Identity, Vector3.One,
+                        new Color4(
+                            x > 0f ? 1f : 0.1f,
+                            y > 0f ? 1f : 0.1f,
+                            z > 0f ? 1f : 0.1f,
+                            1f))
+                ))).Concat(
+                    new List<Entity>
+                    {
+                        new Cube(new Vector3(0, 5, 0), Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.PiOver4) * Quaternion.FromAxisAngle(Vector3.UnitZ, MathHelper.PiOver4), new Vector3(3, 3, 3), Color4.White)
+                    }
+                ).ToList()
+            };
+        }
+
         public static GameWorld BuildDottedSphere(float size, float variance, float density, int columns = 16, int rows = 16)
         {
             var rand = new Random();
@@ -54,7 +78,7 @@ namespace engine
             {
                 var v = Noise.Generate(sx, sy + size * density, sz) * variance;
                 //v = v * v * (v > 0 ? 1 : -1);
-                world.Entities.Add(new PointEntity(new Vector3(0, size + size * v, 0), Quaternion.Identity, Color4.White));
+                world.Entities.Add(new PointEntity(new Vector3(0, size + size * v, 0), Color4.White));
             }
             for (var r = 1; r < rows; r++)
             {
@@ -76,7 +100,7 @@ namespace engine
 
                     world.Entities.Add(
                         new PointEntity(
-                            new Vector3(nx, ny, nz), Quaternion.Identity,
+                            new Vector3(nx, ny, nz),
                             new Color4(
                                 nx > 0f ? 1f : 0.1f,
                                 ny > 0f ? 1f : 0.1f,
@@ -91,7 +115,7 @@ namespace engine
             {
                 var v = Noise.Generate(sx, sy - size * density, sz) * variance;
                 //v = v * v * (v > 0 ? 1 : -1);
-                world.Entities.Add(new PointEntity(new Vector3(0, -(size + size * v), 0), Quaternion.Identity, Color4.White));
+                world.Entities.Add(new PointEntity(new Vector3(0, -(size + size * v), 0), Color4.White));
             }
 
             return world;

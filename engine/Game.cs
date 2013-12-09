@@ -38,6 +38,7 @@ namespace engine
                 Close();
 
             World.OnUpdate(keys, mouse);
+            OpenTK.Input.Mouse.SetPosition(X + Width / 2f, Y + Height / 2f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)

@@ -7,8 +7,8 @@ namespace engine.entities
 {
     public class PointEntity : Entity
     {
-        public PointEntity(Vector3 position, Quaternion rotation, Color4 color)
-            : base(position, rotation)
+        public PointEntity(Vector3 position, Color4 color)
+            : base(position, Quaternion.Identity, Vector3.One)
         {
             Color = color;
         }
@@ -24,7 +24,7 @@ namespace engine.entities
             GL.PointSize(3);
             GL.Begin(PrimitiveType.Points);
             {
-                GL.Vertex3(Position);
+                GL.Vertex3(0, 0, 0);
             }
             GL.End();
             GL.PointSize(1);

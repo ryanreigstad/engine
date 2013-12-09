@@ -48,7 +48,7 @@ namespace engine.entities
         private Vector2 _mouseLast;
 
         public CameraEntity(Vector3 position, Quaternion rotation)
-            : base(position, rotation)
+            : base(position, rotation, Vector3.One)
         {
             Camera = new Camera(position, rotation);
         }
@@ -65,6 +65,11 @@ namespace engine.entities
         {
             get { return Camera.Rotation; }
             set { Camera.Rotation = value; }
+        }
+
+        public new Vector3 Scale
+        {
+            get { return Vector3.One; }
         }
 
         public override void Render()
@@ -146,8 +151,6 @@ namespace engine.entities
 
             Camera.RotateY(dmouse.X * 0.001f);
             Camera.RotateX(dmouse.Y * 0.001f);
-
-            Mouse.SetPosition(0, 0);
         }
     }
 }
