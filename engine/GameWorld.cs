@@ -45,7 +45,7 @@ namespace engine
     {
         public static GameWorld BuildCube()
         {
-            var d = new List<float> {-0.5f, 0.5f};
+            var d = new List<float> {-0.501f, 0.501f};
             return new GameWorld
             {
                 Entities = d.SelectMany(
@@ -61,6 +61,13 @@ namespace engine
                     new List<Entity>
                     {
                         new Cube(new Vector3(0, 5, 0), Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.PiOver4) * Quaternion.FromAxisAngle(Vector3.UnitZ, MathHelper.PiOver4), new Vector3(3, 3, 3), Color4.White)
+                        {
+                            OnUpdate = cube =>
+                            {
+                                // TODO: make the cube rotate (as an animation)
+                            }
+                        },
+                        new Plane(-Vector3.UnitY, Quaternion.Identity, new Vector3(100, 1, 100), Color4.DarkBlue, 100)
                     }
                 ).ToList()
             };

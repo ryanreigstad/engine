@@ -30,9 +30,5 @@ namespace engine.entities
             GL.PointSize(1);
             GL.PopMatrix();
         }
-
-        public override void Update(KeyboardState keyboard, MouseState mouse)
-        {
-        }
     }
 }

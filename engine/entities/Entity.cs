@@ -1,4 +1,6 @@
-﻿using OpenTK;
+﻿using System;
+
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
@@ -17,15 +19,20 @@ namespace engine.entities
         public Quaternion Rotation { get; set; }
         public Vector3 Scale { get; set; }
 
+        public Action<Entity> OnUpdate = t => { };
+
         public abstract void Render();
 
-        public abstract void Update(KeyboardState keyboard, MouseState mouse);
+        public virtual void Update(KeyboardState keyboard, MouseState mouse)
+        {
+            OnUpdate(this);
+        }
 
         protected void ApplyTransform()
         {
             var trans = Matrix4.Identity;
-            trans = trans * Matrix4.CreateScale(Scale);
             trans = trans * Matrix4.CreateFromQuaternion(Rotation);
+            trans = trans * Matrix4.CreateScale(Scale);
             trans = trans * Matrix4.CreateTranslation(Position);
             GL.MultMatrix(ref trans);
         }

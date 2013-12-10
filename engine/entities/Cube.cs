@@ -23,7 +23,7 @@ namespace engine.entities
 
         public override void Render()
         {
-            const float r = 0.5f;
+            const float u = 0.5f;
 
             GL.PushMatrix();
             ApplyTransform();
@@ -32,65 +32,109 @@ namespace engine.entities
             GL.Begin(PrimitiveType.Triangles);
             {
                 // FRONT
-                GL.Vertex3( r,  r,  r);
-                GL.Vertex3( r, -r,  r);
-                GL.Vertex3(-r, -r,  r);
+                GL.Vertex3( u,  u,  u);
+                GL.Vertex3( u, -u,  u);
+                GL.Vertex3(-u, -u,  u);
                 
-                GL.Vertex3( r,  r,  r);
-                GL.Vertex3(-r, -r,  r);
-                GL.Vertex3(-r,  r,  r);
+                GL.Vertex3( u,  u,  u);
+                GL.Vertex3(-u, -u,  u);
+                GL.Vertex3(-u,  u,  u);
                 
                 // LEFT
-                GL.Vertex3(-r,  r,  r);
-                GL.Vertex3(-r, -r,  r);
-                GL.Vertex3(-r, -r, -r);
+                GL.Vertex3(-u,  u,  u);
+                GL.Vertex3(-u, -u,  u);
+                GL.Vertex3(-u, -u, -u);
                 
-                GL.Vertex3(-r,  r,  r);
-                GL.Vertex3(-r, -r, -r);
-                GL.Vertex3(-r,  r, -r);
+                GL.Vertex3(-u,  u,  u);
+                GL.Vertex3(-u, -u, -u);
+                GL.Vertex3(-u,  u, -u);
                 
                 // TOP
-                GL.Vertex3( r,  r,  r);
-                GL.Vertex3(-r,  r,  r);
-                GL.Vertex3(-r,  r, -r);
+                GL.Vertex3( u,  u,  u);
+                GL.Vertex3(-u,  u,  u);
+                GL.Vertex3(-u,  u, -u);
                 
-                GL.Vertex3( r,  r,  r);
-                GL.Vertex3(-r,  r, -r);
-                GL.Vertex3( r,  r, -r);
+                GL.Vertex3( u,  u,  u);
+                GL.Vertex3(-u,  u, -u);
+                GL.Vertex3( u,  u, -u);
                 
                 // RIGHT
-                GL.Vertex3( r,  r,  r);
-                GL.Vertex3( r, -r,  r);
-                GL.Vertex3( r, -r, -r);
+                GL.Vertex3( u,  u,  u);
+                GL.Vertex3( u, -u,  u);
+                GL.Vertex3( u, -u, -u);
                 
-                GL.Vertex3( r,  r,  r);
-                GL.Vertex3( r, -r, -r);
-                GL.Vertex3( r,  r, -r);
+                GL.Vertex3( u,  u,  u);
+                GL.Vertex3( u, -u, -u);
+                GL.Vertex3( u,  u, -u);
                 
                 // BOTTOM
-                GL.Vertex3( r, -r,  r);
-                GL.Vertex3( r, -r, -r);
-                GL.Vertex3(-r, -r, -r);
+                GL.Vertex3( u, -u,  u);
+                GL.Vertex3( u, -u, -u);
+                GL.Vertex3(-u, -u, -u);
 
-                GL.Vertex3( r, -r,  r);
-                GL.Vertex3(-r, -r, -r);
-                GL.Vertex3(-r, -r,  r);
+                GL.Vertex3( u, -u,  u);
+                GL.Vertex3(-u, -u, -u);
+                GL.Vertex3(-u, -u,  u);
                 
                 // BACK
-                GL.Vertex3( r,  r, -r);
-                GL.Vertex3(-r,  r, -r);
-                GL.Vertex3(-r, -r, -r);
+                GL.Vertex3( u,  u, -u);
+                GL.Vertex3(-u,  u, -u);
+                GL.Vertex3(-u, -u, -u);
 
-                GL.Vertex3( r,  r, -r);
-                GL.Vertex3(-r, -r, -r);
-                GL.Vertex3( r, -r, -r);
+                GL.Vertex3( u,  u, -u);
+                GL.Vertex3(-u, -u, -u);
+                GL.Vertex3( u, -u, -u);
             }
             GL.End();
-            GL.PopMatrix();
-        }
 
-        public override void Update(KeyboardState keyboard, MouseState mouse)
-        {
+            const float u2 = u + 0.001f;
+            GL.Color4(Color4.Black);
+            GL.Begin(PrimitiveType.Lines);
+            {
+                // FRONT
+                GL.Vertex3( u2,  u2,  u2);
+                GL.Vertex3(-u2,  u2,  u2);
+                
+                GL.Vertex3(-u2,  u2,  u2);
+                GL.Vertex3(-u2, -u2,  u2);
+
+                GL.Vertex3(-u2, -u2,  u2);
+                GL.Vertex3( u2, -u2,  u2);
+                
+                GL.Vertex3( u2, -u2,  u2);
+                GL.Vertex3( u2,  u2,  u2);
+
+                // BACK
+                GL.Vertex3( u2,  u2, -u2);
+                GL.Vertex3(-u2,  u2, -u2);
+
+                GL.Vertex3(-u2,  u2, -u2);
+                GL.Vertex3(-u2, -u2, -u2);
+
+                GL.Vertex3(-u2, -u2, -u2);
+                GL.Vertex3( u2, -u2, -u2);
+
+                GL.Vertex3( u2, -u2, -u2);
+                GL.Vertex3( u2,  u2, -u2);
+
+                // LEFT
+                GL.Vertex3(-u2,  u2,  u2);
+                GL.Vertex3(-u2,  u2, -u2);
+
+                GL.Vertex3(-u2, -u2,  u2);
+                GL.Vertex3(-u2, -u2, -u2);
+
+                // RIGHT
+                GL.Vertex3( u2,  u2,  u2);
+                GL.Vertex3( u2,  u2, -u2);
+                
+                GL.Vertex3( u2, -u2,  u2);
+                GL.Vertex3( u2, -u2, -u2);
+
+            }
+            GL.End();
+
+            GL.PopMatrix();
         }
     }
 }
