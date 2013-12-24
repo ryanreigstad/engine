@@ -24,6 +24,8 @@ namespace engine
 
             GL.Enable(EnableCap.AlphaTest);
             GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.VertexArray);
+            GL.Enable(EnableCap.IndexArray);
             GL.ClearColor(Color4.Black);
         }
 
@@ -38,7 +40,7 @@ namespace engine
                 Close();
 
             World.OnUpdate(keys, mouse);
-            OpenTK.Input.Mouse.SetPosition(X + Width / 2f, Y + Height / 2f);
+            OpenTK.Input.Mouse.SetPosition(X + Width / 2f + 7, Y + Height / 2f + 31);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
