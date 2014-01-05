@@ -12,30 +12,11 @@ namespace engine.entities
 {
     public class VboEntity : Entity
     {
-        public VboEntity(Vector3 position, Quaternion rotation, Vector3 scale)
+        public VboEntity(Vector3 position, Quaternion rotation, Vector3 scale, int[] colors = null)
             : base(position, rotation, scale)
         {
-            _vertices = new[] { 
-				new Vector3(-1.0f, -1.0f, 1.0f), 
-				new Vector3(1.0f, -1.0f, 1.0f), 
-				new Vector3(1.0f, 1.0f, 1.0f), 
-				new Vector3(-1.0f, 1.0f, 1.0f), 
-				new Vector3(-1.0f, -1.0f, -1.0f), 
-				new Vector3(1.0f, -1.0f, -1.0f), 
-				new Vector3(1.0f, 1.0f, -1.0f), 
-				new Vector3(-1.0f, 1.0f, -1.0f) 
-			};
-            _normals = new[] { 
-				new Vector3(-1.0f, -1.0f, 1.0f), 
-				new Vector3(1.0f, -1.0f, 1.0f), 
-				new Vector3(1.0f, 1.0f, 1.0f), 
-				new Vector3(-1.0f, 1.0f, 1.0f), 
-				new Vector3(-1.0f, -1.0f, -1.0f), 
-				new Vector3(1.0f, -1.0f, -1.0f), 
-				new Vector3(1.0f, 1.0f, -1.0f), 
-				new Vector3(-1.0f, 1.0f, -1.0f) 
-			};
-            _colors = new[] { 
+            _vertices = VboFactory.CreateCubeVboData(out _indices, out _normals);
+            _colors = colors ?? new[] { 
 				VboFactory.ColorToRgba32(Color.Cyan), 
 				VboFactory.ColorToRgba32(Color.Cyan), 
 				VboFactory.ColorToRgba32(Color.DarkCyan), 
@@ -45,16 +26,15 @@ namespace engine.entities
 				VboFactory.ColorToRgba32(Color.DarkCyan), 
 				VboFactory.ColorToRgba32(Color.DarkCyan) 
 			};
-            _indices = new uint[] { 
-				0, 1, 2, 2, 3, 0, 
-				3, 2, 6, 6, 7, 3, 
-				7, 6, 5, 5, 4, 7, 
-				4, 0, 3, 3, 7, 4, 
-				0, 1, 5, 5, 4, 0,
-				1, 5, 6, 6, 2, 1 
-			};
+            _numIndices = _indices.Length;
         }
 
+        public VboEntity(Vector3 position, Quaternion rotation, Vector3 scale, int vertexBuffer, int indexBuffer, int colorBuffer, int numIndices)
+            : base(position, rotation, scale)
+        {
+            ids = new[] {vertexBuffer, indexBuffer, colorBuffer, 0};
+            _numIndices = numIndices;
+        }
 
         public VboEntity(Vector3 position, Quaternion rotation, Vector3 scale, Vector3[] vertices, Vector3[] normals, int[] colors, uint[] indices)
             : base(position, rotation, scale)
@@ -63,20 +43,25 @@ namespace engine.entities
             _normals = normals;
             _colors = colors;
             _indices = indices;
+            _numIndices = indices.Length;
         }
 
         private readonly Vector3[] _vertices;
         private readonly Vector3[] _normals;
         private readonly int[] _colors;
         private readonly uint[] _indices;
+        private readonly int _numIndices;
 
         protected int[] ids = new int[0];
 
-        public override void Render()
+        public override void Load()
         {
             if (ids.Length == 0)
                 ids = VboFactory.CreateVbo(_vertices, _normals, _colors, _indices);
+        }
 
+        public override void Render()
+        {
             if (ids[(int)VboFactory.VboId.Vertex] == 0)
                 return;
             if (ids[(int)VboFactory.VboId.Index] == 0)
@@ -117,7 +102,7 @@ namespace engine.entities
 
                 // Draw the elements in the element array buffer
                 // Draws up items in the Color, Vertex, TexCoordinate, and Normal Buffers using indices in the ElementArrayBuffer
-                GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
+                GL.DrawElements(PrimitiveType.Triangles, _numIndices, DrawElementsType.UnsignedInt, IntPtr.Zero);
             }
 
             GL.PopMatrix();
@@ -126,6 +111,38 @@ namespace engine.entities
 
     public static class VboFactory
     {
+        public static Vector3[] CreateCubeVboData(out uint[] indices, out Vector3[] normals)
+        {
+            normals = new[] { 
+				new Vector3(-1.0f, -1.0f, 1.0f), 
+				new Vector3(1.0f, -1.0f, 1.0f), 
+				new Vector3(1.0f, 1.0f, 1.0f), 
+				new Vector3(-1.0f, 1.0f, 1.0f), 
+				new Vector3(-1.0f, -1.0f, -1.0f), 
+				new Vector3(1.0f, -1.0f, -1.0f), 
+				new Vector3(1.0f, 1.0f, -1.0f), 
+				new Vector3(-1.0f, 1.0f, -1.0f) 
+			};
+            indices = new uint[] { 
+				0, 1, 2, 2, 3, 0, 
+				3, 2, 6, 6, 7, 3, 
+				7, 6, 5, 5, 4, 7, 
+				4, 0, 3, 3, 7, 4, 
+				0, 1, 5, 5, 4, 0,
+				1, 5, 6, 6, 2, 1 
+			};
+            return new[] { 
+				new Vector3(-1.0f, -1.0f, 1.0f), 
+				new Vector3(1.0f, -1.0f, 1.0f), 
+				new Vector3(1.0f, 1.0f, 1.0f), 
+				new Vector3(-1.0f, 1.0f, 1.0f), 
+				new Vector3(-1.0f, -1.0f, -1.0f), 
+				new Vector3(1.0f, -1.0f, -1.0f), 
+				new Vector3(1.0f, 1.0f, -1.0f), 
+				new Vector3(-1.0f, 1.0f, -1.0f) 
+			};
+        }
+
         public static int[] CreateVbo(Vector3[] vertices, Vector3[] normals, int[] colors, uint[] indices)
         {
             var ids = new[] {0, 0, 0, 0};
@@ -232,10 +249,10 @@ namespace engine.entities
 
         public enum VboId
         {
-            Color = 0,
+            Vertex = 0,
+            Index,
+            Color,
             Normal,
-            Vertex,
-            Index
         }
     }
 }

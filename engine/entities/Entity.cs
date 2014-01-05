@@ -19,10 +19,11 @@ namespace engine.entities
         public Quaternion Rotation { get; set; }
         public Vector3 Scale { get; set; }
 
-        public Action<Entity> OnUpdate = t => { };
+        public virtual void Load() {}
 
         public abstract void Render();
 
+        public Action<Entity> OnUpdate = t => { };
         public virtual void Update(KeyboardState keyboard, MouseState mouse)
         {
             OnUpdate(this);

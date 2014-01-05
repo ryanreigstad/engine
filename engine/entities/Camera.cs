@@ -44,7 +44,7 @@ namespace engine.entities
 
     public class CameraEntity : Entity
     {
-        public const float Velocity = 0.1f;
+        public const float Velocity = 0.3f;
         private Vector2 _mouseLast;
 
         public CameraEntity(Vector3 position, Quaternion rotation)

@@ -20,13 +20,18 @@ namespace engine
         {
             base.OnLoad(e);
 
-            Title = "Camera stuff";
+            Title = "Game Engine Mk 0.0.1";
 
             GL.Enable(EnableCap.AlphaTest);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.VertexArray);
             GL.Enable(EnableCap.IndexArray);
+
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+
             GL.ClearColor(Color4.Black);
+
+            World.OnLoad();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)

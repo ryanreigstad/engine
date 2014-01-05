@@ -54,10 +54,14 @@
     <Compile Include="Game.cs" />
     <Compile Include="GameWorld.cs" />
     <Compile Include="InputConfig.cs" />
+    <Compile Include="BufferLibrary.cs" />
+    <Compile Include="MarchingCubes.cs" />
     <Compile Include="Noise.cs" />
     <Compile Include="entities\PointEntity.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vertex.cs" />
+    <Compile Include="Voxel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
