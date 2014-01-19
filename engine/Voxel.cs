@@ -5,45 +5,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using OpenTK;
+using OpenTK.Graphics;
+
 namespace engine
 {
     public struct Voxel
-        : IEquatable<Voxel>
     {
-        public static readonly Voxel Empty = new Voxel(Color.Transparent);
+        public static readonly Voxel Empty = new Voxel(-1.0, VoxelType.None, Vector3.UnitY);
 
-        public Voxel(Color color)
+        public Voxel(double density, VoxelType type, Vector3 normal)
         {
-            Color = color;
+            Density = density;
+            Type = type;
+            Normal = normal;
         }
 
-        public Color Color;
+        public readonly double Density;
+        public readonly VoxelType Type;
+        public readonly Vector3 Normal;
 
-        public bool Equals(Voxel other)
+        public bool IsSolid()
         {
-            return Color.Equals(other.Color);
+            return Density <= 0;
         }
 
-        public override bool Equals(object obj)
+        public Color GetColor()
         {
-            if (ReferenceEquals(null, obj))
-                return false;
-            return obj is Voxel && Equals((Voxel)obj);
+            return IsSolid() ? Color.Transparent : Color.FromName(Type.ToString());
         }
+    }
 
-        public override int GetHashCode()
-        {
-            return Color.GetHashCode();
-        }
-
-        public static bool operator ==(Voxel left, Voxel right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Voxel left, Voxel right)
-        {
-            return !(left == right);
-        }
+    public enum VoxelType
+    {
+        None = 0,
+        DarkGray,
+        Blue,
     }
 }

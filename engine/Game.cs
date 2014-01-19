@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -22,14 +23,27 @@ namespace engine
 
             Title = "Game Engine Mk 0.0.1";
 
+            // general
             GL.Enable(EnableCap.AlphaTest);
             GL.Enable(EnableCap.DepthTest);
+
+            // vbo
             GL.Enable(EnableCap.VertexArray);
             GL.Enable(EnableCap.IndexArray);
+
+            // lighting
+            GL.Light(LightName.Light0, LightParameter.Position, new float[] { 0.0f, 100.0f, 0.0f });
+            GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.1f, 0.1f, 0.1f, 1.0f });
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+            GL.Enable(EnableCap.ColorMaterial);
 
             //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
             GL.ClearColor(Color4.Black);
+
+            ClientSize = new Size(1600, 900);
+            Location = new Point((1920 - ClientSize.Width) / 2, (1080 - ClientSize.Height) / 2);
 
             World.OnLoad();
         }

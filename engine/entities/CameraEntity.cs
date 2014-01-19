@@ -6,74 +6,19 @@ using OpenTK.Input;
 
 namespace engine.entities
 {
-    public class Camera
-    {
-        public Camera(Vector3 position, Quaternion rotation)
-        {
-            Position = position;
-            Rotation = rotation;
-        }
-
-        public Vector3 Position { get; set; }
-        public Quaternion Rotation { get; set; }
-
-        public void Move(Vector3 v)
-        {
-            Position += v;
-        }
-
-        public void MoveLocal(Vector3 v)
-        {
-            Position += Vector3.TransformVector(v, Matrix4.CreateFromQuaternion(Rotation));
-        }
-
-        public void RotateX(float radians)
-        {
-            var q = Quaternion.FromAxisAngle(Vector3.UnitX, radians);
-            Rotation = Rotation * q;
-            Rotation.Normalize();
-        }
-
-        public void RotateY(float radians)
-        {
-            var q = Quaternion.FromAxisAngle(Vector3.UnitY, radians);
-            Rotation = q * Rotation;
-            Rotation.Normalize();
-        }
-    }
-
     public class CameraEntity : Entity
     {
-        public const float Velocity = 0.3f;
+        private float _velocity = 0.1f;
         private Vector2 _mouseLast;
 
         public CameraEntity(Vector3 position, Quaternion rotation)
             : base(position, rotation, Vector3.One)
         {
-            Camera = new Camera(position, rotation);
-        }
-
-        public Camera Camera { get; set; }
-
-        public new Vector3 Position
-        {
-            get { return Camera.Position; }
-            set { Camera.Position = value; }
-        }
-
-        public new Quaternion Rotation
-        {
-            get { return Camera.Rotation; }
-            set { Camera.Rotation = value; }
-        }
-
-        public new Vector3 Scale
-        {
-            get { return Vector3.One; }
         }
 
         public override void Render()
         {
+            // don't ApplyTransform() because we want inverse transform
             var matrix = Matrix4.CreateFromQuaternion(Rotation).Inverted();
             DrawAxisMap(matrix);
 
@@ -83,6 +28,7 @@ namespace engine.entities
 
         private void DrawAxisMap(Matrix4 rotation)
         {
+            // this could probably be made better
             GL.PushMatrix();
             var ortho = Matrix4.CreateOrthographic(1, 1, 0.01f, 10f);
             GL.LoadMatrix(ref ortho);
@@ -116,41 +62,70 @@ namespace engine.entities
 
         public override void Update(KeyboardState keyboard, MouseState mouse)
         {
+            // breakpoint ?
             if (keyboard[Key.Space])
             {
             }
 
+            // movement
+            var v = Vector3.Zero;
             if (keyboard[InputConfig.MoveForward])
             {
-                Camera.MoveLocal(-Vector3.UnitZ * Velocity);
+                v += -Vector3.UnitZ * _velocity;
             }
             if (keyboard[InputConfig.MoveBackward])
             {
-                Camera.MoveLocal(Vector3.UnitZ * Velocity);
+                v += (Vector3.UnitZ * _velocity);
             }
             if (keyboard[InputConfig.MoveRight])
             {
-                Camera.MoveLocal(Vector3.UnitX * Velocity);
+                v += (Vector3.UnitX * _velocity);
             }
             if (keyboard[InputConfig.MoveLeft])
             {
-                Camera.MoveLocal(-Vector3.UnitX * Velocity);
+                v += (-Vector3.UnitX * _velocity);
             }
             if (keyboard[InputConfig.MoveUp])
             {
-                Camera.Move(Vector3.UnitY * Velocity);
+                v += (Vector3.UnitY * _velocity);
             }
             if (keyboard[InputConfig.MoveDown])
             {
-                Camera.Move(-Vector3.UnitY * Velocity);
+                v += (-Vector3.UnitY * _velocity);
+            }
+            MoveLocal(v);
+
+            // rotation
+            if (keyboard[InputConfig.RollLeft])
+            {
+                RotateZ(0.03f);
+            }
+            if (keyboard[InputConfig.RollRight])
+            {
+                RotateZ(-0.03f);
             }
 
             var mouseNow = new Vector2(mouse.X, mouse.Y);
-            var dmouse = _mouseLast - mouseNow;
-            _mouseLast = mouseNow;
+            if (mouseNow != _mouseLast)
+            {
+                var dmouse = _mouseLast - mouseNow;
+                _mouseLast = mouseNow;
 
-            Camera.RotateY(dmouse.X * 0.001f);
-            Camera.RotateX(dmouse.Y * 0.001f);
+                RotateY(dmouse.X * 0.001f);
+                RotateX(dmouse.Y * 0.001f);
+            }
+
+            // move speed
+            if (keyboard[InputConfig.MoveFaster])
+            {
+                _velocity += 0.01f;
+            }
+            if (keyboard[InputConfig.MoveSlower])
+            {
+                _velocity -= 0.01f;
+                if (_velocity < 0)
+                    _velocity = 0;
+            }
         }
     }
 }

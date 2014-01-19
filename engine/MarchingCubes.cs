@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace engine
 {
     public static class MarchingCubes
     {
+        // TODO: voxel density
         static MarchingCubes()
         {
             StateTriangles = new int[256][][];
@@ -281,19 +283,19 @@ namespace engine
         /// <param name="data">the voxels</param>
         /// <param name="size">how big it is in local frame</param>
         /// <returns>new int[] {vb, ib, cb}</returns>
-        public static int[] March(Voxel[][][] data, float size, string name, out int indexCount)
+        public static int[] March(Voxel[,,] data, float size, string name, out int indexCount)
         {
-            var vertices = new List<Vector3>();
+            var vertices = new List<Vertex>();
             var indices = new List<uint>();
             var colors = new List<Color>();
 
             var t = -size / 2f;
-            var xi = data.Length / size;
-            var yi = data[0].Length / size;
-            var zi = data[0][0].Length / size;
+            var xi = size / data.GetLength(0);
+            var yi = size / data.GetLength(1);
+            var zi = size / data.GetLength(2);
 
-            Action<Vector3, Color, Vector3, Color, Vector3, Color> makeTri
-                = (v0, c0, v1, c1, v2, c2) =>
+            Action<Vertex, Vertex, Vertex> makeTri
+                = (v0, v1, v2) =>
                 {
                     //var i = -1;
                     //if ((i = vertices.FindIndex(v => Math.Abs(v.X - v0.X) < xi / 4f && Math.Abs(v.Y - v0.Y) < yi / 4f && Math.Abs(v.Z - v0.Z) < zi / 4f)) != -1)
@@ -305,7 +307,6 @@ namespace engine
                     //{
                         indices.Add((uint)vertices.Count);
                         vertices.Add(v0);
-                        colors.Add(c0);
                     //}
                     //if ((i = vertices.FindIndex(v => Math.Abs(v.X - v1.X) < xi / 4f && Math.Abs(v.Y - v1.Y) < yi / 4f && Math.Abs(v.Z - v1.Z) < zi / 4f)) != -1)
                     //{
@@ -316,7 +317,6 @@ namespace engine
                     //{
                         indices.Add((uint)vertices.Count);
                         vertices.Add(v1);
-                        colors.Add(c1);
                     //}
                     //if ((i = vertices.FindIndex(v => Math.Abs(v.X - v2.X) < xi / 4f && Math.Abs(v.Y - v2.Y) < yi / 4f && Math.Abs(v.Z - v2.Z) < zi / 4f)) != -1)
                     //{
@@ -327,46 +327,47 @@ namespace engine
                     //{
                         indices.Add((uint) vertices.Count);
                         vertices.Add(v2);
-                        colors.Add(c2);
                     //}
                 };
 
-            for (var x = 0; x < data.Length - 1; x++)
+            var rand = new Random();
+            for (var x = 0; x < data.GetLength(0) - 1; x++)
             {
-                for (var y = 0; y < data[x].Length - 1; y++)
+                for (var y = 0; y < data.GetLength(1) - 1; y++)
                 {
-                    for (var z = 0; z < data[x][y].Length - 1; z++)
+                    for (var z = 0; z < data.GetLength(2) - 1; z++)
                     {
                         var state =
-                            (data[x][y][z] != Voxel.Empty ? 1 : 0)
-                            | (data[x][y][z + 1] != Voxel.Empty ? 1 : 0) << 1
-                            | (data[x][y + 1][z] != Voxel.Empty ? 1 : 0) << 2
-                            | (data[x][y + 1][z + 1] != Voxel.Empty ? 1 : 0) << 3
-                            | (data[x + 1][y][z] != Voxel.Empty ? 1 : 0) << 4
-                            | (data[x + 1][y][z + 1] != Voxel.Empty ? 1 : 0) << 5
-                            | (data[x + 1][y + 1][z] != Voxel.Empty ? 1 : 0) << 6
-                            | (data[x + 1][y + 1][z + 1] != Voxel.Empty ? 1 : 0) << 7;
+                            (data[x, y, z].IsSolid() ? 1 : 0)
+                            | (data[x, y, z + 1].IsSolid() ? 1 : 0) << 1
+                            | (data[x, y + 1, z].IsSolid() ? 1 : 0) << 2
+                            | (data[x, y + 1, z + 1].IsSolid() ? 1 : 0) << 3
+                            | (data[x + 1, y, z].IsSolid() ? 1 : 0) << 4
+                            | (data[x + 1, y, z + 1].IsSolid() ? 1 : 0) << 5
+                            | (data[x + 1, y + 1, z].IsSolid() ? 1 : 0) << 6
+                            | (data[x + 1, y + 1, z + 1].IsSolid() ? 1 : 0) << 7;
                         var tris = StateTriangles[state];
                         if (state == 0 || state == 255 || tris == null)
                             continue;
 
                         var cpos = new Vector3(t + x * xi + xi / 2f, t + y * yi + yi / 2f, t + z * zi + zi / 2f);
                         var c = AvgNotTransparent(
-                            data[x][y][z].Color,
-                            data[x][y][z + 1].Color,
-                            data[x][y + 1][z].Color,
-                            data[x][y + 1][z + 1].Color,
-                            data[x + 1][y][z].Color,
-                            data[x + 1][y][z + 1].Color,
-                            data[x + 1][y + 1][z].Color,
-                            data[x + 1][y + 1][z + 1].Color);
+                            data[x, y, z].GetColor().MutateColor(50, rand),
+                            data[x, y, z + 1].GetColor().MutateColor(50, rand),
+                            data[x, y + 1, z].GetColor().MutateColor(50, rand),
+                            data[x, y + 1, z + 1].GetColor().MutateColor(50, rand),
+                            data[x + 1, y, z].GetColor().MutateColor(50, rand),
+                            data[x + 1, y, z + 1].GetColor().MutateColor(50, rand),
+                            data[x + 1, y + 1, z].GetColor().MutateColor(50, rand),
+                            data[x + 1, y + 1, z + 1].GetColor().MutateColor(50, rand));
+                        var n = data[x, y, z].Normal;
                         for (var i = 0; i < tris.Length; i++)
                         {
                             var tri = tris[i];
-                            var v0 = new Vector3(StateVertices[tri[0]].X * xi, StateVertices[tri[0]].Y * yi, StateVertices[tri[0]].Z * zi);
-                            var v1 = new Vector3(StateVertices[tri[1]].X * xi, StateVertices[tri[1]].Y * yi, StateVertices[tri[1]].Z * zi);
-                            var v2 = new Vector3(StateVertices[tri[2]].X * xi, StateVertices[tri[2]].Y * yi, StateVertices[tri[2]].Z * zi);
-                            makeTri(v0 + cpos, c, v1 + cpos, c, v2 + cpos, c);
+                            var v0 = new Vertex(new Vector3(StateVertices[tri[0]].X * xi, StateVertices[tri[0]].Y * yi, StateVertices[tri[0]].Z * zi) + cpos, c, n);
+                            var v1 = new Vertex(new Vector3(StateVertices[tri[1]].X * xi, StateVertices[tri[1]].Y * yi, StateVertices[tri[1]].Z * zi) + cpos, c, n);
+                            var v2 = new Vertex(new Vector3(StateVertices[tri[2]].X * xi, StateVertices[tri[2]].Y * yi, StateVertices[tri[2]].Z * zi) + cpos, c, n);
+                            makeTri(v0, v1, v2);
                         }
                     }
                 }
@@ -374,11 +375,19 @@ namespace engine
 
             var ids = new[] {0, 0, 0};
             ids[0] = BufferLibrary.CreateVertexBuffer(name + ":v", vertices.ToArray());
-            ids[1] = BufferLibrary.CreateIndexBuffer(name + ":i", indices.ToArray());
-            ids[2] = BufferLibrary.CreateColorBuffer(name + ":t", colors.Select(c => c.ToRgba()).ToArray());
+            ids[1] = BufferLibrary.CreateIndexBuffer(name + ":i", indices.ToArray(), PrimitiveType.Triangles);
 
             indexCount = indices.Count;
             return ids;
+        }
+
+        private static Color MutateColor(this Color c, int amount, Random r)
+        {
+            var m = new[] { r.Next(amount * 2) - amount, r.Next(amount * 2) - amount, r.Next(amount * 2) - amount };
+            return Color.FromArgb(
+                c.R + m[0] < 0 ? 0 : c.R + m[0] > 255 ? 255 : c.R + m[0],
+                c.G + m[1] < 0 ? 0 : c.G + m[1] > 255 ? 255 : c.G + m[1],
+                c.B + m[2] < 0 ? 0 : c.B + m[2] > 255 ? 255 : c.B + m[2]);
         }
 
         public static Color Blend(this Color t, params Color[] others)

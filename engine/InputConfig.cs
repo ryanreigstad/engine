@@ -10,5 +10,9 @@ namespace engine
         public const Key MoveRight = Key.D;
         public const Key MoveUp = Key.LShift;
         public const Key MoveDown = Key.LControl;
+        public const Key RollLeft = Key.Q;
+        public const Key RollRight = Key.E;
+        public const Key MoveFaster = Key.Plus;
+        public const Key MoveSlower = Key.Minus;
     }
 }
