@@ -8,7 +8,7 @@ namespace engine
     [StructLayout(LayoutKind.Sequential)]
     public struct Vertex
     {
-        public Vertex(Vector3 position, Color4 color, Vector3 normal)
+        public Vertex(Vector3 position, Vector4 color, Vector3 normal)
         {
             Position = position;
             Color = color;
@@ -16,7 +16,7 @@ namespace engine
         }
 
         public Vector3 Position;
-        public Color4 Color;
+        public Vector4 Color;
         public Vector3 Normal;
 
         public const int SizeInBytes = sizeof(float) * 10;

@@ -364,9 +364,9 @@ namespace engine
                         for (var i = 0; i < tris.Length; i++)
                         {
                             var tri = tris[i];
-                            var v0 = new Vertex(new Vector3(StateVertices[tri[0]].X * xi, StateVertices[tri[0]].Y * yi, StateVertices[tri[0]].Z * zi) + cpos, c, n);
-                            var v1 = new Vertex(new Vector3(StateVertices[tri[1]].X * xi, StateVertices[tri[1]].Y * yi, StateVertices[tri[1]].Z * zi) + cpos, c, n);
-                            var v2 = new Vertex(new Vector3(StateVertices[tri[2]].X * xi, StateVertices[tri[2]].Y * yi, StateVertices[tri[2]].Z * zi) + cpos, c, n);
+                            var v0 = new Vertex(new Vector3(StateVertices[tri[0]].X * xi, StateVertices[tri[0]].Y * yi, StateVertices[tri[0]].Z * zi) + cpos, c.AsVector4(), n);
+                            var v1 = new Vertex(new Vector3(StateVertices[tri[1]].X * xi, StateVertices[tri[1]].Y * yi, StateVertices[tri[1]].Z * zi) + cpos, c.AsVector4(), n);
+                            var v2 = new Vertex(new Vector3(StateVertices[tri[2]].X * xi, StateVertices[tri[2]].Y * yi, StateVertices[tri[2]].Z * zi) + cpos, c.AsVector4(), n);
                             makeTri(v0, v1, v2);
                         }
                     }
@@ -388,6 +388,11 @@ namespace engine
                 c.R + m[0] < 0 ? 0 : c.R + m[0] > 255 ? 255 : c.R + m[0],
                 c.G + m[1] < 0 ? 0 : c.G + m[1] > 255 ? 255 : c.G + m[1],
                 c.B + m[2] < 0 ? 0 : c.B + m[2] > 255 ? 255 : c.B + m[2]);
+        }
+
+        private static Vector4 AsVector4(this Color c, float alpha = 1.0f)
+        {
+            return new Vector4(c.R/255f, c.G/255f, c.B/255f, alpha);
         }
 
         public static Color Blend(this Color t, params Color[] others)

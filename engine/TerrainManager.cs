@@ -51,7 +51,7 @@ namespace engine
                         density += Noise.Generate(
                             (float) (NoiseLocation.X + ns.X + NoiseStep * x * 1),
                             (float)(NoiseLocation.X + ns.Y + NoiseStep * y * 1),
-                            (float)(NoiseLocation.X + ns.Z + NoiseStep * z * 1)) / 4f;
+                            (float)(NoiseLocation.X + ns.Z + NoiseStep * z * 1)) / 2f;
 
                         density += Noise.Generate(
                             (float)(NoiseLocation.X + ns.X * 2 + NoiseStep * x * 2),

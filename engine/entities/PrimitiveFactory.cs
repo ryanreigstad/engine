@@ -16,26 +16,22 @@ namespace engine.entities
                 BufferLibrary.CreateVertexBuffer(
                     name + "_" + color.ToArgb() + ":v", new[]
                     {
-                        new Vertex(new Vector3(-0.5f, -0.5f, 0.5f), color, new Vector3(-0.5f, -0.5f, 0.5f)),
-                        new Vertex(new Vector3(0.5f, -0.5f, 0.5f), color, new Vector3(0.5f, -0.5f, 0.5f)),
-                        new Vertex(new Vector3(0.5f, 0.5f, 0.5f), color, new Vector3(0.5f, 0.5f, 0.5f)),
-                        new Vertex(new Vector3(-0.5f, 0.5f, 0.5f), color, new Vector3(-0.5f, 0.5f, 0.5f)),
-                        new Vertex(new Vector3(-0.5f, -0.5f, -0.5f), color, new Vector3(-0.5f, -0.5f, -0.5f)),
-                        new Vertex(new Vector3(0.5f, -0.5f, -0.5f), color, new Vector3(0.5f, -0.5f, -0.5f)),
-                        new Vertex(new Vector3(0.5f, 0.5f, -0.5f), color, new Vector3(0.5f, 0.5f, -0.5f)),
-                        new Vertex(new Vector3(-0.5f, 0.5f, -0.5f), color, new Vector3(-0.5f, 0.5f, -0.5f))
+                        new Vertex(new Vector3(1f, 1f, 1f)  , new Vector4(1, 0, 0, 1), new Vector3(0.5f, 0.5f, 0.5f)),
+                        new Vertex(new Vector3(-1f, 1f, 1f) , new Vector4(0, 1, 0, 1), new Vector3(-0.5f, 0.5f, 0.5f)),
+                        new Vertex(new Vector3(-1f, 1f, -1f), new Vector4(0, 0, 1, 1), new Vector3(-0.5f, 0.5f, -0.5f)),
+                        new Vertex(new Vector3(1f, 1f, -1f) , new Vector4(1, 1, 0, 1), new Vector3(0.5f, 0.5f, -0.5f)),
+                        new Vertex(new Vector3(1f, -1f, 1f), new Vector4(1, 0, 0, 1), new Vector3(0.5f, -0.5f, 0.5f)),
+                        new Vertex(new Vector3(-1f, -1f, 1f), new Vector4(0, 1, 0, 1), new Vector3(-0.5f, -0.5f, 0.5f)),
+                        new Vertex(new Vector3(-1f, -1f, -1f), new Vector4(0, 0, 1, 1), new Vector3(-0.5f, -0.5f, -0.5f)),
+                        new Vertex(new Vector3(1f, -1f, -1f), new Vector4(1, 1, 0, 1), new Vector3(0.5f, -0.5f, -0.5f))
                     });
             }
             if (!BufferLibrary.HasBuffer(name + ":i"))
             {
                 BufferLibrary.CreateIndexBuffer(name + ":i", new uint[]
                     {
-                        0, 1, 2, 2, 3, 0, 
-			            3, 2, 6, 6, 7, 3, 
-			            7, 6, 5, 5, 4, 7, 
-			            4, 0, 3, 3, 7, 4, 
-			            0, 1, 5, 5, 4, 0,
-			            1, 5, 6, 6, 2, 1
+                        0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, //top 2 squares
+                        1, 0, 4, 1, 5, 4, 2, 1, 5, 2, 5, 6, // 2 sides adjacent from eachother
                     }, PrimitiveType.Triangles);
             }
             return new VboEntity(position, rotation, scale, BufferLibrary.GetBuffer(name + "_" + color.ToArgb() + ":v"), BufferLibrary.GetBuffer(name + ":i"), BufferLibrary.GetBuffer(name + ":i#count"), (PrimitiveType)BufferLibrary.GetBuffer(name + ":i#mode"));
@@ -52,7 +48,7 @@ namespace engine.entities
                 {
                     for (var y = 0; y <= yd; y++)
                     {
-                        verts.Add(new Vertex(new Vector3((x - xd / 2f) / (xd / 2f), 0, (y - yd / 2f) / (yd / 2f)), color, Vector3.UnitY));
+                        verts.Add(new Vertex(new Vector3((x - xd / 2f) / (xd / 2f), 0, (y - yd / 2f) / (yd / 2f)), new Vector4(0, 1, 0, 1), Vector3.UnitY));
                     }
                 }
 

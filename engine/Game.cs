@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
-
+using System.IO;
+using System.Linq;
+using engine.entities;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -16,11 +19,21 @@ namespace engine
         }
 
         public GameWorld World { get; set; }
+        public Matrix4 Projection { get; set; }
+
+        public int VertexShader;
+        public int FragmentShader;
+        public int Program;
+        public int VertexAttribProjection;
+        public int VertexAttribModelView;
+        public int VertexAttribInverseTranspose;
+        public int VertexAttribMVP;
+
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-
+            Projection = Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI / 4.0f), Width / (float)Height, 0.01f, 100000f);
             Title = "Game Engine Mk 0.0.1";
 
             // general
@@ -31,14 +44,7 @@ namespace engine
             GL.Enable(EnableCap.VertexArray);
             GL.Enable(EnableCap.IndexArray);
 
-            // lighting
-            GL.Light(LightName.Light0, LightParameter.Position, new float[] { 0.0f, 100.0f, 0.0f });
-            GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.1f, 0.1f, 0.1f, 1.0f });
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light0);
-            GL.Enable(EnableCap.ColorMaterial);
-
-            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            LoadShaders();
 
             GL.ClearColor(Color4.Black);
 
@@ -46,6 +52,43 @@ namespace engine
             Location = new Point((1920 - ClientSize.Width) / 2, (1080 - ClientSize.Height) / 2);
 
             World.OnLoad();
+        }
+
+        public void LoadShaders()
+        {
+            Program = GL.CreateProgram();
+
+            LoadShaderFromFile("vertexshader1.sh", ShaderType.VertexShader, Program, out VertexShader);
+            LoadShaderFromFile("fragmentshader.sh", ShaderType.FragmentShader, Program, out FragmentShader);
+
+            GL.LinkProgram(Program);
+            //debug, can remove
+            Console.WriteLine(GL.GetProgramInfoLog(Program));
+            /////
+
+            VertexAttribProjection = GL.GetAttribLocation(Program, "projection");
+            VertexAttribModelView = GL.GetUniformLocation(Program, "modelview");
+            VertexAttribMVP = GL.GetUniformLocation(Program, "MVP");
+
+            //if (VertexAttribPosition == -1 || VertexAttribProjection == -1 || VertexAttribModelView == -1)
+            //{
+            //    Console.WriteLine("Error binding attributes. VPosition:" + VertexAttribPosition + " VColor" + VertexAttribProjection + " MView:" + VertexAttribModelView);
+            // }
+        }
+
+        
+        public void LoadShaderFromFile(string filename, ShaderType type, int program, out int address)
+        {
+            address = GL.CreateShader(type);
+            using (var sr = new StreamReader(@"C:\Users\Tree\Documents\GitHub\engine\engine\Shaders\" + filename))
+            {
+                GL.ShaderSource(address, sr.ReadToEnd());
+            }
+            GL.CompileShader(address);
+            GL.AttachShader(program, address);
+            //debug, can remove
+            Console.WriteLine(GL.GetShaderInfoLog(address));
+            ////////
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -58,6 +101,7 @@ namespace engine
             if (keys[Key.Escape])
                 Close();
 
+
             World.OnUpdate(keys, mouse);
             OpenTK.Input.Mouse.SetPosition(X + Width / 2f + 7, Y + Height / 2f + 31);
         }
@@ -66,10 +110,17 @@ namespace engine
         {
             base.OnRenderFrame(e);
 
-            GL.MatrixMode(MatrixMode.Modelview);
+            GL.UseProgram(Program);
+            
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.LoadIdentity();
+            var pvMatrix = World.Camera.LookAt()*Projection;
+            foreach (var entity in World.Entities)
+            {
+                var MVP =  entity.GetModelMatrix()*pvMatrix;
+                GL.UniformMatrix4(VertexAttribMVP, false, ref MVP);
+            }
+
             World.OnRender();
 
             SwapBuffers();
@@ -84,6 +135,7 @@ namespace engine
             var projection = Matrix4.CreatePerspectiveFieldOfView((float) (Math.PI / 4.0f), Width / (float) Height, 0.01f, 100000f);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref projection);
+            Projection = projection;
         }
     }
 }

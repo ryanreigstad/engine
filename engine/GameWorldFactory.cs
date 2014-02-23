@@ -31,19 +31,21 @@ namespace engine
             world.OnLoading += () =>
             {
                 world.Entities.Add(PrimitiveFactory.BuildPlane(new Vector3(0, -3, 0), Quaternion.Identity, Vector3.One * 5, Color.Green, 2, 2));
-                world.Entities.Add(PrimitiveFactory.BuildPlane(new Vector3(0, -1, 0), Quaternion.Identity, Vector3.One * 3, Color.LightGreen, 2, 2));
+                //world.Entities.Add(PrimitiveFactory.BuildPlane(new Vector3(0, -1, 0), Quaternion.Identity, Vector3.One * 3, Color.LightGreen, 2, 2));
 
-                var c = PrimitiveFactory.BuildCube(new Vector3(0, 0, 0), Quaternion.Identity, Vector3.One, Color.Red);
-                c.OnUpdate += _this => _this.RotateY(0.01f);
+                var c = PrimitiveFactory.BuildCube(new Vector3(0, 0, 0), Quaternion.Identity, Vector3.One, Color.Green);
+                //c.OnUpdate += _this => _this.RotateY(0.01f);
                 world.Entities.Add(c);
 
-                c = PrimitiveFactory.BuildCube(new Vector3(-3, 0, 0), Quaternion.Identity, Vector3.One, Color.Blue);
-                c.OnUpdate += _this => _this.RotateX(0.01f);
-                world.Entities.Add(c);
+                world.Entities.Add(new TerrainManager(new Vector3(0, 0, 0), Quaternion.Identity, Vector3.One));
 
-                c = PrimitiveFactory.BuildCube(new Vector3(3, 0, 0), Quaternion.Identity, Vector3.One, Color.Blue);
-                c.OnUpdate += _this => _this.RotateZ(0.01f);
-                world.Entities.Add(c);
+                //c = PrimitiveFactory.BuildCube(new Vector3(-3, 0, 0), Quaternion.Identity, Vector3.One, Color.Blue);
+                //c.OnUpdate += _this => _this.RotateX(0.01f);
+                //world.Entities.Add(c);
+
+                //c = PrimitiveFactory.BuildCube(new Vector3(3, 0, 0), Quaternion.Identity, Vector3.One, Color.Blue);
+                //c.OnUpdate += _this => _this.RotateZ(0.01f);
+                //world.Entities.Add(c);
             };
 
             return world;

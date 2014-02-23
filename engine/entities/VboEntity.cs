@@ -1,5 +1,4 @@
 ﻿using System;
-
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -16,10 +15,10 @@ namespace engine.entities
             _mode = mode;
         }
 
-        private readonly int _vbo;
-        private readonly int _ibo;
-        private readonly int _count;
-        private readonly PrimitiveType _mode;
+        public readonly int _vbo;
+        public readonly int _ibo;
+        public readonly int _count;
+        public readonly PrimitiveType _mode;
 
         public override void Render()
         {
@@ -27,10 +26,10 @@ namespace engine.entities
                 return;
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ibo);
             GL.VertexPointer(3, VertexPointerType.Float, Vertex.SizeInBytes, (IntPtr)0);
             GL.ColorPointer(4, ColorPointerType.Float, Vertex.SizeInBytes, (IntPtr)(sizeof(float) * 3));
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ibo);
+            //GL.NormalPointer(NormalPointerType.Float, Vertex.SizeInBytes, (IntPtr)(sizeof(float) * 7));
 
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.ColorArray);
@@ -46,6 +45,8 @@ namespace engine.entities
             GL.DisableClientState(ArrayCap.VertexArray);
             GL.DisableClientState(ArrayCap.ColorArray);
             GL.DisableClientState(ArrayCap.IndexArray);
+
+            GL.Flush();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
