@@ -16,14 +16,14 @@ namespace engine.entities
                 BufferLibrary.CreateVertexBuffer(
                     name + "_" + color.ToArgb() + ":v", new[]
                     {
-                        new Vertex(new Vector3(1f, 1f, 1f)  , new Vector4(1, 0, 0, 1), new Vector3(0.5f, 0.5f, 0.5f)),
-                        new Vertex(new Vector3(-1f, 1f, 1f) , new Vector4(0, 1, 0, 1), new Vector3(-0.5f, 0.5f, 0.5f)),
-                        new Vertex(new Vector3(-1f, 1f, -1f), new Vector4(0, 0, 1, 1), new Vector3(-0.5f, 0.5f, -0.5f)),
-                        new Vertex(new Vector3(1f, 1f, -1f) , new Vector4(1, 1, 0, 1), new Vector3(0.5f, 0.5f, -0.5f)),
-                        new Vertex(new Vector3(1f, -1f, 1f), new Vector4(1, 0, 0, 1), new Vector3(0.5f, -0.5f, 0.5f)),
-                        new Vertex(new Vector3(-1f, -1f, 1f), new Vector4(0, 1, 0, 1), new Vector3(-0.5f, -0.5f, 0.5f)),
-                        new Vertex(new Vector3(-1f, -1f, -1f), new Vector4(0, 0, 1, 1), new Vector3(-0.5f, -0.5f, -0.5f)),
-                        new Vertex(new Vector3(1f, -1f, -1f), new Vector4(1, 1, 0, 1), new Vector3(0.5f, -0.5f, -0.5f))
+                        new Vertex(new Vector3(1f, 1f, 1f)  , new Vector4(1, 1, 1, 1f), new Vector3(0.5f, 0.5f, 0.5f), new Vector2(0, 1)),
+                        new Vertex(new Vector3(-1f, 1f, 1f) , new Vector4(1, 1, 1, 1f), new Vector3(-0.5f, 0.5f, 0.5f), new Vector2(1, 1)),
+                        new Vertex(new Vector3(-1f, 1f, -1f), new Vector4(1, 1, 1, 1f), new Vector3(-0.5f, 0.5f, -0.5f), new Vector2(1, 0)),
+                        new Vertex(new Vector3(1f, 1f, -1f) , new Vector4(1, 1, 1, 1f), new Vector3(0.5f, 0.5f, -0.5f), new Vector2(0, 0)),
+                        new Vertex(new Vector3(1f, -1f, 1f), new Vector4(1, 1, 1, 1f), new Vector3(0.5f, -0.5f, 0.5f), new Vector2(0, 1)),
+                        new Vertex(new Vector3(-1f, -1f, 1f), new Vector4(1, 1, 1, 1f), new Vector3(-0.5f, -0.5f, 0.5f), new Vector2(1, 1)),
+                        new Vertex(new Vector3(-1f, -1f, -1f), new Vector4(1, 1, 1, 1f), new Vector3(-0.5f, -0.5f, -0.5f), new Vector2(1, 0)),
+                        new Vertex(new Vector3(1f, -1f, -1f), new Vector4(1, 1, 1, 1f), new Vector3(0.5f, -0.5f, -0.5f), new Vector2(0, 0))
                     });
             }
             if (!BufferLibrary.HasBuffer(name + ":i"))
@@ -48,7 +48,7 @@ namespace engine.entities
                 {
                     for (var y = 0; y <= yd; y++)
                     {
-                        verts.Add(new Vertex(new Vector3((x - xd / 2f) / (xd / 2f), 0, (y - yd / 2f) / (yd / 2f)), new Vector4(0, 1, 0, 1), Vector3.UnitY));
+                        verts.Add(new Vertex(new Vector3((x - xd / 2f) / (xd / 2f), 0, (y - yd / 2f) / (yd / 2f)), new Vector4(0, 1, 0, 1), Vector3.UnitY, new Vector2((x/xd), (y/yd))));
                     }
                 }
 

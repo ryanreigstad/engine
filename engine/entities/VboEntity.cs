@@ -29,11 +29,13 @@ namespace engine.entities
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ibo);
             GL.VertexPointer(3, VertexPointerType.Float, Vertex.SizeInBytes, (IntPtr)0);
             GL.ColorPointer(4, ColorPointerType.Float, Vertex.SizeInBytes, (IntPtr)(sizeof(float) * 3));
-            //GL.NormalPointer(NormalPointerType.Float, Vertex.SizeInBytes, (IntPtr)(sizeof(float) * 7));
+            GL.NormalPointer(NormalPointerType.Float, Vertex.SizeInBytes, (IntPtr)(sizeof(float) * 7));
+            GL.TexCoordPointer(2, TexCoordPointerType.Float, Vertex.SizeInBytes, (IntPtr)(sizeof(float) * 10));
 
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.ColorArray);
             GL.EnableClientState(ArrayCap.IndexArray);
+            GL.EnableClientState(ArrayCap.TextureCoordArray);
 
             GL.PushMatrix();
             ApplyTransform();
@@ -45,7 +47,7 @@ namespace engine.entities
             GL.DisableClientState(ArrayCap.VertexArray);
             GL.DisableClientState(ArrayCap.ColorArray);
             GL.DisableClientState(ArrayCap.IndexArray);
-
+            GL.DisableClientState(ArrayCap.TextureCoordArray);
             GL.Flush();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);

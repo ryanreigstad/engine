@@ -56,7 +56,7 @@ namespace engine.entities
         {
             // this could probably be made better
             GL.PushMatrix();
-            var ortho = Matrix4.CreateOrthographic(1, 1, 0.01f, 10f);
+            var ortho = Matrix4.CreateOrthographic(1, 1, 0.05f, 10f);
             GL.LoadMatrix(ref ortho);
             GL.Translate(new Vector3(0.0f, 0.0f, 1f));
             GL.MultMatrix(ref rotation);
@@ -147,7 +147,6 @@ namespace engine.entities
             Rotation = Quaternion.Slerp(Rotation, TargetOrientation, 0.1f);
 
             Position = Vector3.Lerp(Position, Position + v, 0.5f);
-
             // move speed
             if (keyboard[InputConfig.MoveFaster])
             {
