@@ -51,22 +51,22 @@ namespace engine
                         density += Noise.Generate(
                             (float) (NoiseLocation.X + ns.X + NoiseStep * x * 1),
                             (float)(NoiseLocation.X + ns.Y + NoiseStep * y * 1),
-                            (float)(NoiseLocation.X + ns.Z + NoiseStep * z * 1)) / 2f;
+                            (float)(NoiseLocation.X + ns.Z + NoiseStep * z * 1)) / 4f;
 
-                        density += Noise.Generate(
-                            (float)(NoiseLocation.X + ns.X * 2 + NoiseStep * x * 2),
-                            (float)(NoiseLocation.X + ns.Y * 2 + NoiseStep * y * 2),
-                            (float)(NoiseLocation.X + ns.Z * 2 + NoiseStep * z * 2)) / 8f;
+                        //density += Noise.Generate(
+                        //    (float)(NoiseLocation.X + ns.X * 2 + NoiseStep * x * 2),
+                        //    (float)(NoiseLocation.X + ns.Y * 2 + NoiseStep * y * 2),
+                        //    (float)(NoiseLocation.X + ns.Z * 2 + NoiseStep * z * 2)) / 8f;
 
-                        density += Noise.Generate(
-                            (float)(NoiseLocation.X + ns.X * 4 + NoiseStep * x * 4),
-                            (float)(NoiseLocation.X + ns.Y * 4 + NoiseStep * y * 4),
-                            (float)(NoiseLocation.X + ns.Z * 4 + NoiseStep * z * 4)) / 16f;
+                        //density += Noise.Generate(
+                        //    (float)(NoiseLocation.X + ns.X * 4 + NoiseStep * x * 4),
+                        //    (float)(NoiseLocation.X + ns.Y * 4 + NoiseStep * y * 4),
+                        //    (float)(NoiseLocation.X + ns.Z * 4 + NoiseStep * z * 4)) / 16f;
 
-                        density += Noise.Generate(
-                            (float)(NoiseLocation.X + ns.X * 8 + NoiseStep * x * 8),
-                            (float)(NoiseLocation.X + ns.Y * 8 + NoiseStep * y * 8),
-                            (float)(NoiseLocation.X + ns.Z * 8 + NoiseStep * z * 8)) / 32f;
+                        //density += Noise.Generate(
+                        //    (float)(NoiseLocation.X + ns.X * 8 + NoiseStep * x * 8),
+                        //    (float)(NoiseLocation.X + ns.Y * 8 + NoiseStep * y * 8),
+                        //    (float)(NoiseLocation.X + ns.Z * 8 + NoiseStep * z * 8)) / 32f;
 
                         data[x, y, z] = density;
                     }

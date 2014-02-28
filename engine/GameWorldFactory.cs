@@ -37,7 +37,7 @@ namespace engine
                 //c.OnUpdate += _this => _this.RotateY(0.01f);
                 world.Entities.Add(c);
 
-                world.Entities.Add(new TerrainManager(new Vector3(0, 0, 0), Quaternion.Identity, Vector3.One));
+                //world.Entities.Add(new TerrainManager(new Vector3(0, 0, 0), Quaternion.Identity, Vector3.One));
 
                 //c = PrimitiveFactory.BuildCube(new Vector3(-3, 0, 0), Quaternion.Identity, Vector3.One, Color.Blue);
                 //c.OnUpdate += _this => _this.RotateX(0.01f);

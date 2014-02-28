@@ -364,9 +364,9 @@ namespace engine
                         for (var i = 0; i < tris.Length; i++)
                         {
                             var tri = tris[i];
-                            var v0 = new Vertex(new Vector3(StateVertices[tri[0]].X * xi, StateVertices[tri[0]].Y * yi, StateVertices[tri[0]].Z * zi) + cpos, c.AsVector4(), n);
-                            var v1 = new Vertex(new Vector3(StateVertices[tri[1]].X * xi, StateVertices[tri[1]].Y * yi, StateVertices[tri[1]].Z * zi) + cpos, c.AsVector4(), n);
-                            var v2 = new Vertex(new Vector3(StateVertices[tri[2]].X * xi, StateVertices[tri[2]].Y * yi, StateVertices[tri[2]].Z * zi) + cpos, c.AsVector4(), n);
+                            var v0 = new Vertex(new Vector3(StateVertices[tri[0]].X * xi, StateVertices[tri[0]].Y * yi, StateVertices[tri[0]].Z * zi) + cpos, c.AsVector4(), n, new Vector2(0, 1));
+                            var v1 = new Vertex(new Vector3(StateVertices[tri[1]].X * xi, StateVertices[tri[1]].Y * yi, StateVertices[tri[1]].Z * zi) + cpos, c.AsVector4(), n, new Vector2(0, 0));
+                            var v2 = new Vertex(new Vector3(StateVertices[tri[2]].X * xi, StateVertices[tri[2]].Y * yi, StateVertices[tri[2]].Z * zi) + cpos, c.AsVector4(), n, new Vector2(1, 1));
                             makeTri(v0, v1, v2);
                         }
                     }

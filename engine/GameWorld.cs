@@ -22,7 +22,7 @@ namespace engine
 
         public GameWorld()
         {
-            Camera = new CameraEntity(new Vector3(0, 0, -10.0f), Quaternion.FromAxisAngle(Vector3.UnitZ, 0));
+            Camera = new CameraEntity(new Vector3(0, 0, 10.0f), Quaternion.FromAxisAngle(-Vector3.UnitZ, 0));
             Entities = new List<Entity>();
             Instance = this;
         }
