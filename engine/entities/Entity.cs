@@ -12,23 +12,12 @@ namespace engine.entities
         {
             Position = position;
             Rotation = rotation;
-            TargetOrientation = rotation;
             Scale = scale;
         }
 
         public Vector3 Position { get; set; }
         public Quaternion Rotation { get; set; }
         public Vector3 Scale { get; set; }
-
-        public Quaternion PitchRotation { get; set; }
-        public Quaternion YawRotation { get; set; }
-        public Quaternion RollRotation { get; set; }
-
-        public Quaternion TargetOrientation { get; set; }
-
-        public float PitchAngle { get; set; }
-        public float YawAngle { get; set; }
-        public float RollAngle { get; set; }
 
         public virtual void Load() {}
 
@@ -82,57 +71,37 @@ namespace engine.entities
 
         public void MoveLocal(Vector3 v)
         {
-            //Position = Vector3.Lerp(Position, v, .25f);
-            Position += v;// Vector3.TransformVector(v, Matrix4.CreateFromQuaternion(Rotation));
-
+            Position += Vector3.TransformVector(v, Matrix4.CreateFromQuaternion(Rotation));
         }
 
+        /// <summary>
+        /// Pitch in local frame
+        /// </summary>
+        /// <param name="radians"></param>
         public void RotateX(float radians)
         {
             Rotation *= Quaternion.FromAxisAngle(Vector3.UnitX, radians);
             Rotation.Normalize();
         }
 
+        /// <summary>
+        /// Yaw in local frame
+        /// </summary>
+        /// <param name="radians"></param>
         public void RotateY(float radians)
         {
             Rotation *= Quaternion.FromAxisAngle(Vector3.UnitY, radians);
             Rotation.Normalize();
         }
 
+        /// <summary>
+        /// Roll in local frame
+        /// </summary>
+        /// <param name="radians"></param>
         public void RotateZ(float radians)
         {
             Rotation *= Quaternion.FromAxisAngle(Vector3.UnitZ, radians);
             Rotation.Normalize();
-        }
-
-        public void Pitch()
-        {
-            while (PitchAngle > Math.PI * 2)
-                PitchAngle = PitchAngle - ((float)Math.PI * 2);
-            while (PitchAngle < -Math.PI * 2)
-                PitchAngle = PitchAngle + ((float)Math.PI * 2);
-
-            PitchRotation = Quaternion.FromAxisAngle(Vector3.UnitX, PitchAngle);
-        }
-
-        public void Yaw()
-        {
-            while (YawAngle > Math.PI * 2)
-                YawAngle = YawAngle - ((float)Math.PI * 2);
-            while (YawAngle < -Math.PI * 2)
-                YawAngle = YawAngle + ((float)Math.PI * 2);
-
-            YawRotation = Quaternion.FromAxisAngle(Vector3.UnitY, YawAngle);
-        }
-
-        public void Roll()
-        {
-            while (RollAngle > Math.PI * 2)
-                RollAngle = RollAngle - ((float)Math.PI * 2);
-            while (RollAngle < -Math.PI * 2)
-                RollAngle = RollAngle + ((float)Math.PI * 2);
-
-            RollRotation = Quaternion.FromAxisAngle(Vector3.UnitZ, RollAngle);
         }
     }
 }

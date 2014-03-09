@@ -42,6 +42,9 @@ namespace engine
             // general
             GL.Enable(EnableCap.AlphaTest);
             GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             // vbo
             GL.Enable(EnableCap.VertexArray);
@@ -61,29 +64,32 @@ namespace engine
         {
             Program = GL.CreateProgram();
 
-            LoadShaderFromFile("vertexshader1.sh", ShaderType.VertexShader, Program, out VertexShader);
-            LoadShaderFromFile("fragmentshader.sh", ShaderType.FragmentShader, Program, out FragmentShader);
+            LoadShaderFromFile("vs.sh", ShaderType.VertexShader, Program, out VertexShader);
+            LoadShaderFromFile("fs.sh", ShaderType.FragmentShader, Program, out FragmentShader);
 
             GL.LinkProgram(Program);
             //debug, can remove
             Console.WriteLine(GL.GetProgramInfoLog(Program));
             /////
 
-            VertexAttribProjection = GL.GetAttribLocation(Program, "projection");
-            VertexAttribModelView = GL.GetUniformLocation(Program, "modelview");
-            VertexAttribMVP = GL.GetUniformLocation(Program, "MVP");
+            //VertexAttribProjection = GL.GetAttribLocation(Program, "projection");
+            //VertexAttribModelView = GL.GetUniformLocation(Program, "modelview");
+            //VertexAttribMVP = GL.GetUniformLocation(Program, "MVP");
 
             //if (VertexAttribPosition == -1 || VertexAttribProjection == -1 || VertexAttribModelView == -1)
             //{
             //    Console.WriteLine("Error binding attributes. VPosition:" + VertexAttribPosition + " VColor" + VertexAttribProjection + " MView:" + VertexAttribModelView);
             // }
+
+            GL.UseProgram(Program);
         }
 
         
         public void LoadShaderFromFile(string filename, ShaderType type, int program, out int address)
         {
             address = GL.CreateShader(type);
-            using (var sr = new StreamReader(@"C:\Users\Tree\Documents\GitHub\engine\engine\Shaders\" + filename))
+            
+            using (var sr = new StreamReader(Environment.CurrentDirectory + @"\..\..\Shaders\" + filename))
             {
                 GL.ShaderSource(address, sr.ReadToEnd());
             }
@@ -157,7 +163,6 @@ namespace engine
             if (keys[Key.Escape])
                 Close();
 
-
             World.OnUpdate(keys, mouse);
             OpenTK.Input.Mouse.SetPosition(X + Width / 2f + 7, Y + Height / 2f + 31);
         }
@@ -165,22 +170,17 @@ namespace engine
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-
-            GL.UseProgram(Program);
             
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            var pvMatrix = World.Camera.LookAt()*Projection;
+            //var pvMatrix = World.Camera.LookAt()*Projection;
             int loc = GL.GetUniformLocation(Program, "Tex1");
             GL.Uniform1(loc, TextureId);
-            GL.Enable(EnableCap.Texture2D);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            foreach (var entity in World.Entities)
-            {
-                var MVP =  entity.GetModelMatrix()*pvMatrix;
-                GL.UniformMatrix4(VertexAttribMVP, false, ref MVP);
-            }
+            //foreach (var entity in World.Entities)
+            //{
+            //    var MVP =  entity.GetModelMatrix()*pvMatrix;
+            //    GL.UniformMatrix4(VertexAttribMVP, false, ref MVP);
+            //}
 
             World.OnRender();
 

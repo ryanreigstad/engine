@@ -68,8 +68,10 @@
     <None Include="App.config" />
     <None Include="Shaders\fragmentshader.sh" />
     <None Include="Shaders\fragmentshader1.sh" />
+    <None Include="Shaders\fs.sh" />
     <None Include="Shaders\vertexshader.sh" />
     <None Include="Shaders\vertexshader1.sh" />
+    <None Include="Shaders\vs.sh" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Textures\smiley.png" />
