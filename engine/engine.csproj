@@ -48,21 +48,25 @@
     <Compile Include="entities\Boid.cs" />
     <Compile Include="entities\CameraEntity.cs" />
     <Compile Include="entities\Entity.cs" />
-    <Compile Include="entities\PrimitiveFactory.cs" />
+    <Compile Include="Factories\PrimitiveFactory.cs" />
     <Compile Include="entities\VboEntity.cs" />
-    <Compile Include="Game.cs" />
-    <Compile Include="GameWorld.cs" />
-    <Compile Include="GameWorldFactory.cs" />
-    <Compile Include="InputConfig.cs" />
-    <Compile Include="BufferLibrary.cs" />
-    <Compile Include="MarchingCubes.cs" />
-    <Compile Include="Noise.cs" />
+    <Compile Include="Libraries\ProgramLibrary.cs" />
+    <Compile Include="Game\Util.cs" />
+    <Compile Include="Game\Game.cs" />
+    <Compile Include="Game\GameWorld.cs" />
+    <Compile Include="Factories\GameWorldFactory.cs" />
+    <Compile Include="Config\InputConfig.cs" />
+    <Compile Include="Factories\BufferLibrary.cs" />
+    <Compile Include="Factories\MarchingCubes.cs" />
+    <Compile Include="entities\Noise.cs" />
     <Compile Include="entities\PointEntity.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Game\Program.cs" />
+    <Compile Include="Libraries\ShaderLibrary.cs" />
+    <Compile Include="Libraries\TextureLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TerrainManager.cs" />
-    <Compile Include="Vertex.cs" />
-    <Compile Include="Voxel.cs" />
+    <Compile Include="Libraries\TerrainManager.cs" />
+    <Compile Include="entities\Vertex.cs" />
+    <Compile Include="entities\Voxel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -74,6 +78,7 @@
   <ItemGroup>
     <Content Include="Textures\smiley.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
