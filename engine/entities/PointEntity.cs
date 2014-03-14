@@ -1,7 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 namespace engine.entities
 {
@@ -27,7 +26,7 @@ namespace engine.entities
                 GL.Vertex3(0, 0, 0);
             }
             GL.End();
-            GL.PointSize(1);
+            GL.PointSize(3);
             GL.PopMatrix();
         }
     }

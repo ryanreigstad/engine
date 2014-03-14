@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using OpenTK.Graphics.OpenGL;
 
-namespace engine
+namespace engine.Libraries
 {
     public static class BufferLibrary
     {
@@ -21,9 +21,12 @@ namespace engine
 
         public static int CreateVertexBuffer(string name, Vertex[] vertices)
         {
+            var isNormalized = true;
+
             var id = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, id);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(Vertex.SizeInBytes * vertices.Length), vertices, BufferUsageHint.StaticDraw);
+            
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             RegisterBuffer(name, id);

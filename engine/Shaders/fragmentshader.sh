@@ -1,15 +1,12 @@
-﻿//////////////////////////////////////////////////
-#version 330
+﻿#version 410
 //////////////////////////////////////////////////
 /////Layouts//////////////////////////////////////
-layout(location = 1) in vec4 vColor;
-layout(location = 3) in vec2 texCoords;
-
 
 /////Uniforms/////////////////////////////////////
 uniform sampler2D Tex1;
 
-
+in vec2 texCoord;
+in vec4 outColor;  
 
 /////Outputs//////////////////////////////////////
 out vec4 outputColor;
@@ -17,22 +14,9 @@ out vec4 outputColor;
 
 void main()
 {
-	
-	vec4 tex1Color = texture( Tex1, texCoords );
-
-	if ( tex1Color.a < 0.15 )
+	if (outColor.a < 0.15f)
 		discard;
 	else
-	{
-		if ( gl_FrontFacing )
-		{
-			outputColor = tex1Color;
-		}
-		else
-		{
-			outputColor = -tex1Color;
-		}
-	}
-
-	outputcolor = vec4(1,1,1,1);
+		outputColor = outColor;
+	
 }

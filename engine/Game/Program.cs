@@ -1,4 +1,6 @@
-﻿namespace engine
+﻿using engine.Libraries;
+
+namespace engine.Game
 {
     internal class Program
     {
