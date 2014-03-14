@@ -19,7 +19,11 @@ namespace engine.entities
         public Quaternion Rotation { get; set; }
         public Vector3 Scale { get; set; }
 
+<<<<<<< HEAD
         public virtual void Load() { }
+=======
+        public virtual void Load() {}
+>>>>>>> 2adcb1c3c9d879bd8d3e92ae273b452a761e885f
 
         public abstract void Render();
 
@@ -57,11 +61,14 @@ namespace engine.entities
 
         public Vector3 GetTransform(Vector3 v)
         {
+<<<<<<< HEAD
             return Vector3.TransformVector(v, Matrix4.CreateFromQuaternion(Rotation));
         }
 
         public void MoveLocal(Vector3 v)
         {
+=======
+>>>>>>> 2adcb1c3c9d879bd8d3e92ae273b452a761e885f
             Position += Vector3.TransformVector(v, Matrix4.CreateFromQuaternion(Rotation));
         }
 
