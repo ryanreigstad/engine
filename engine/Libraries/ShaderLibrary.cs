@@ -48,7 +48,7 @@ namespace engine.Libraries
             //create the shader
             address = GL.CreateShader(type);
             //load the file from the disk
-            using (var sr = new StreamReader(@"C:\Users\Tree\Documents\GitHub\engine\engine\Shaders\" + filename))
+            using (var sr = new StreamReader(Environment.CurrentDirectory + @"\..\..\Shaders\" + filename))
             {
                 GL.ShaderSource(address, sr.ReadToEnd());
             }

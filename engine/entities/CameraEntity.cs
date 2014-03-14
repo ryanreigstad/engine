@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 ﻿using engine.Config;
 using OpenTK;
-=======
-﻿using OpenTK;
->>>>>>> 2adcb1c3c9d879bd8d3e92ae273b452a761e885f
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
@@ -19,8 +15,7 @@ namespace engine.entities
         {
         }
 
-        public new Matrix4 Transform
-<<<<<<< HEAD
+        public Matrix4 Transform
         {
             get
             {
@@ -36,17 +31,6 @@ namespace engine.entities
 
         public override void Render()
         {
-=======
-        {
-            get
-            {
-                return Matrix4.CreateTranslation(-Position) * Matrix4.CreateFromQuaternion(Rotation).Inverted();
-            }
-        }
-
-        public override void Render()
-        {
->>>>>>> 2adcb1c3c9d879bd8d3e92ae273b452a761e885f
             // don't ApplyTransform() because we want inverse transform
             var matrix = Transform;
             GL.MultMatrix(ref matrix);
@@ -63,7 +47,6 @@ namespace engine.entities
             var v = Vector3.Zero;
             if (keyboard[InputConfig.MoveForward])
             {
-<<<<<<< HEAD
                 v += Vector3.UnitZ * _velocity;
             }
             if (keyboard[InputConfig.MoveBackward])
@@ -77,21 +60,6 @@ namespace engine.entities
             if (keyboard[InputConfig.MoveLeft])
             {
                 v += (Vector3.UnitX * _velocity);
-=======
-                v += -Vector3.UnitZ * _velocity;
-            }
-            if (keyboard[InputConfig.MoveBackward])
-            {
-                v += (Vector3.UnitZ * _velocity);
-            }
-            if (keyboard[InputConfig.MoveRight])
-            {
-                v += (Vector3.UnitX * _velocity);
-            }
-            if (keyboard[InputConfig.MoveLeft])
-            {
-                v += (-Vector3.UnitX * _velocity);
->>>>>>> 2adcb1c3c9d879bd8d3e92ae273b452a761e885f
             }
             if (keyboard[InputConfig.MoveUp])
             {
@@ -120,11 +88,7 @@ namespace engine.entities
                 _mouseLast = mouseNow;
 
                 RotateY(dmouse.X * 0.001f);
-<<<<<<< HEAD
                 RotateX(dmouse.Y * -0.001f);
-=======
-                RotateX(dmouse.Y * 0.001f);
->>>>>>> 2adcb1c3c9d879bd8d3e92ae273b452a761e885f
             }
 
             // move speed
