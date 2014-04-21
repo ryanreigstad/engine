@@ -16,12 +16,14 @@ namespace engine.testificate
             world.OnLoading += () =>
             {
                 MeshLibrary.LoadObjFile("alduin.obj");
+                MeshLibrary.LoadObjFile("serpentine city.obj");
                 TextureLibrary.LoadTextureFromFile("alduin.jpg");
+                TextureLibrary.LoadTextureFromFile("smiley.png");
 
                 world.Entities.Add(new Entity("alduin.obj", "alduin.jpg"));
-                //world.Entities.Add(new FullScreenQuad("alduin.jpg") {Scale = Vector3.One / 1f});
+                world.Entities.Add(new Entity("serpentine city.obj", "smiley.png"));
 
-                world.Lights.Add(new PointLight(Vector3.One, Vector3.One) {Scale = Vector3.One * 50});
+                world.Lights.Add(new AmbientLight(Vector3.One, Vector3.One));
             };
 
             return world;

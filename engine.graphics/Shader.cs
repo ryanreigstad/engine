@@ -177,7 +177,9 @@ namespace engine.graphics
             }
             if (_modelViewMatrix >= 0)
             {
-                var modelView = light.Transform * view;
+                var modelView = light.Transform;
+                if (!(light is AmbientLight))
+                    modelView *= view;
                 GL.UniformMatrix4(_modelViewMatrix, false, ref modelView);
             }
             if (_lightSpecularity >= 0)

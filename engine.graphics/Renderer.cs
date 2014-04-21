@@ -141,17 +141,18 @@ namespace engine.graphics
                 os.UpdateUniforms(view, entity);
                 RenderMesh(MeshLibrary.GetMesh(entity.MeshName));
             }
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _frameBuffer);
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+            // TODO: blitting is slow (er than a fullscreen quad)
             GL.BlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
 
-            // TEST DEFERRED BUFFERS
+            // TEST DEFERRED BUFFERS (no lights)
             //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
             //s.Bind();
-            //var q = new FullScreenQuad("" + _frameBufferTextures[NormalBuffer]);
+            //var q = new FullScreenQuad("" + _frameBufferTextures[NormalBuffer]);          // change the buffer to see a different one
             //s.UpdateUniforms(view, q);
             //RenderMesh(MeshLibrary.GetMesh(q.MeshName));
             //return;

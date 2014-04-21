@@ -16,15 +16,5 @@ namespace engine.graphics
             MoveLocal(Vector3.UnitZ * -0.1f);
             RotateX((float) (Math.PI / 2.0f));
         }
-
-        //public Matrix4 Transform
-        //{
-        //    get { return base.Transform.Inverted(); }
-        //}
-
-        //public Matrix4 RotationMatrix
-        //{
-        //    get { return base.RotationMatrix.Inverted(); }
-        //}
     }
 }

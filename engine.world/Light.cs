@@ -1,4 +1,6 @@
-﻿using OpenTK;
+﻿using System;
+
+using OpenTK;
 
 namespace engine.world
 {
@@ -32,6 +34,25 @@ namespace engine.world
         public PointLight(Vector3 specularity, Vector3 diffuse, Vector3 position, Quaternion rotation, Vector3 scale)
             : base(Mesh, specularity, diffuse, position, rotation, scale)
         {
+        }
+    }
+
+    public class AmbientLight : Light
+    {
+        private const string Mesh = "plane.obj";
+
+        public AmbientLight(Vector3 specularity, Vector3 diffuse)
+            : base(Mesh, specularity, diffuse)
+        {
+            MoveLocal(Vector3.UnitZ * -0.1f);
+            RotateX((float)(Math.PI / 2.0f));
+        }
+
+        public AmbientLight(Vector3 specularity, Vector3 diffuse, Vector3 position, Quaternion rotation, Vector3 scale)
+            : base(Mesh, specularity, diffuse, position, rotation, scale)
+        {
+            MoveLocal(Vector3.UnitZ * -0.1f);
+            RotateX((float)(Math.PI / 2.0f));
         }
     }
 }
