@@ -21,7 +21,7 @@ namespace engine.graphics
 
         public void AddProgram(string src, ShaderType type)
         {
-            int shader = GL.CreateShader(type);
+            var shader = GL.CreateShader(type);
 
             if (shader == 0)
                 throw new Exception("no shader");
@@ -105,11 +105,14 @@ namespace engine.graphics
             }
             if (_modelViewMatrix >= 0)
             {
-                Matrix4 modelView = entity.Transform * view;
+                Matrix4 modelView = entity.Transform;
+                if (!(entity is FullScreenQuad))
+                    modelView *= view;
                 GL.UniformMatrix4(_modelViewMatrix, false, ref modelView);
             }
             if (_texture >= 0)
             {
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, TextureLibrary.GetTexture(entity.TextureName));
                 GL.Uniform1(_texture, 0);
             }
@@ -122,23 +125,25 @@ namespace engine.graphics
         private const string ModelMatrix = "ModelMatrix";
         private const string ModelRotationMatrix = "ModelRotationMatrix";
         private const string ModelViewMatrix = "ModelViewMatrix";
-        private const string PositionTexture = "PositionTexture";
-        private const string NormalTexture = "NormalTexture";
-        private const string TextureTexture = "TextureTexture";
         private const string LightSpecularity = "LightSpecularity";
         private const string LightDiffuse = "LightDiffuse";
         private const string LightPosition = "LightPosition";
+
+        private const string PositionTexture = "PositionTexture";
+        private const string NormalTexture = "NormalTexture";
+        private const string TextureTexture = "TextureTexture";
 
         private int _modelMatrix;
         private int _modelRotationMatrix;
         private int _modelViewMatrix;
         private int _viewMatrix;
-        private int _positionTexture;
-        private int _normalTexture;
-        private int _textureTexture;
         private int _lightSpecularity;
         private int _lightDiffuse;
         private int _lightPosition;
+
+        private int _positionTexture;
+        private int _normalTexture;
+        private int _textureTexture;
 
         protected override void OnCompile()
         {
@@ -146,13 +151,14 @@ namespace engine.graphics
             _modelMatrix = GL.GetUniformLocation(ProgramId, ModelMatrix);
             _modelRotationMatrix = GL.GetUniformLocation(ProgramId, ModelRotationMatrix);
             _modelViewMatrix = GL.GetUniformLocation(ProgramId, ModelViewMatrix);
+            _lightSpecularity = GL.GetUniformLocation(ProgramId, LightSpecularity);
+            _lightDiffuse = GL.GetUniformLocation(ProgramId, LightDiffuse);
+            _lightPosition = GL.GetUniformLocation(ProgramId, LightPosition);
+
             _positionTexture = GL.GetUniformLocation(ProgramId, PositionTexture);
             _normalTexture = GL.GetUniformLocation(ProgramId, NormalTexture);
             _textureTexture = GL.GetUniformLocation(ProgramId, TextureTexture);
             Console.WriteLine("compile: " + PositionTexture + " = " + _positionTexture + "; " + NormalTexture + " = " + _normalTexture + "; " + TextureTexture + " = " + _textureTexture);
-            _lightSpecularity = GL.GetUniformLocation(ProgramId, LightSpecularity);
-            _lightDiffuse = GL.GetUniformLocation(ProgramId, LightDiffuse);
-            _lightPosition = GL.GetUniformLocation(ProgramId, LightPosition);
         }
 
         public void UpdateUniforms(Matrix4 view, Light light)
@@ -174,18 +180,19 @@ namespace engine.graphics
                 var modelView = light.Transform * view;
                 GL.UniformMatrix4(_modelViewMatrix, false, ref modelView);
             }
-            if (_positionTexture >= 0)
-                GL.Uniform1(_positionTexture, 0);
-            if (_normalTexture >= 0)
-                GL.Uniform1(_normalTexture, 1);
-            if (_textureTexture >= 0)
-                GL.Uniform1(_textureTexture, 2);
             if (_lightSpecularity >= 0)
                 GL.Uniform3(_lightSpecularity, light.Specularity);
             if (_lightDiffuse >= 0)
                 GL.Uniform3(_lightDiffuse, light.Diffuse);
             if (_lightPosition >= 0)
                 GL.Uniform3(_lightPosition, light.Position);
+
+            if (_positionTexture >= 0)
+                GL.Uniform1(_positionTexture, 0);
+            if (_normalTexture >= 0)
+                GL.Uniform1(_normalTexture, 1);
+            if (_textureTexture >= 0)
+                GL.Uniform1(_textureTexture, 2);
         }
     }
 }

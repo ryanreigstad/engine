@@ -16,8 +16,8 @@ namespace engine.graphics
     public class Renderer
     {
         private const int PositionBuffer = 0;
-        private const int TextureBuffer = 1;
-        private const int NormalBuffer = 2;
+        private const int NormalBuffer = 1;
+        private const int TextureBuffer = 2;
         private const int DiffuseBuffer = -1; // TODO: this is for ambient occlusion data (i think)
         // todo: edge detection buffer, etc
 
@@ -60,7 +60,7 @@ namespace engine.graphics
 
             _frameBufferTextures[PositionBuffer] = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[PositionBuffer]);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb16f, _width, _height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, (IntPtr)0);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, _width, _height, 0, PixelFormat.Bgra, PixelType.Float, (IntPtr)0);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -69,7 +69,7 @@ namespace engine.graphics
 
             _frameBufferTextures[NormalBuffer] = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[NormalBuffer]);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb16f, _width, _height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, (IntPtr)0);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, _width, _height, 0, PixelFormat.Bgra, PixelType.Float, (IntPtr)0);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -78,7 +78,7 @@ namespace engine.graphics
 
             _frameBufferTextures[TextureBuffer] = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer]);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb16f, _width, _height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, (IntPtr)0);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, _width, _height, 0, PixelFormat.Bgra, PixelType.Float, (IntPtr)0);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -114,15 +114,15 @@ namespace engine.graphics
             var view = world.Camera.Transform * Projection;
 
             // TEST DEFAULT RENDER (no lights)
-            var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
-            s.Bind();
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            foreach (var entity in Cull(world.Entities))
-            {
-                s.UpdateUniforms(view, entity);
-                RenderMesh(MeshLibrary.GetMesh(entity.MeshName));
-            }
-            return;
+            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
+            //s.Bind();
+            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            //foreach (var entity in Cull(world.Entities))
+            //{
+            //    s.UpdateUniforms(view, entity);
+            //    RenderMesh(MeshLibrary.GetMesh(entity.MeshName));
+            //}
+            //return;
             // END TEST
 
             // ENTITY PASS
@@ -133,7 +133,6 @@ namespace engine.graphics
             var deferrable = GetDeferredRenderableEntities(entities);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBuffer);
-            GL.ClearColor(Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.DrawBuffers(3, new[] { DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1, DrawBuffersEnum.ColorAttachment2, });
@@ -145,7 +144,18 @@ namespace engine.graphics
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _frameBuffer);
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.BlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+
+            // TEST DEFERRED BUFFERS
+            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
+            //s.Bind();
+            //var q = new FullScreenQuad("" + _frameBufferTextures[NormalBuffer]);
+            //s.UpdateUniforms(view, q);
+            //RenderMesh(MeshLibrary.GetMesh(q.MeshName));
+            //return;
+            // END TEST
 
             // LIGHT PASS
             var ls = ShaderLibrary.GetShader<LightingShader>("deferred_pass2");
@@ -157,8 +167,6 @@ namespace engine.graphics
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[NormalBuffer]);
             GL.ActiveTexture(TextureUnit.Texture2);
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer]);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit);
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);

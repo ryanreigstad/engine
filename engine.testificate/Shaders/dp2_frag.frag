@@ -13,7 +13,7 @@ uniform vec3 LightDiffuse;
 out vec4 FragColor;
 
 void main () {
-// todo: real tex cords
+// todo: real screen cords
   vec2 ss;
   ss.s = gl_FragCoord.x / 1600.0;
   ss.t = gl_FragCoord.y / 900.0;
@@ -24,5 +24,5 @@ void main () {
   
   // TODO: this.
 
-  FragColor = color;
+  FragColor = color + position / 1000.0f + normal / 100.0f;
 }

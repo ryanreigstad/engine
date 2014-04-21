@@ -9,11 +9,13 @@ layout(location = 0) in vec3 vPosition;
 layout(location = 1) in vec3 vNormal;
 layout(location = 2) in vec2 vTexture;
 
-out Data {
+struct Data {
 	vec3 Position;
 	vec3 Normal;
 	vec2 Texture;
-} vdata;
+};
+
+out Data vdata;
 
 void main () {
 	vec4 p = ModelViewMatrix * vec4(vPosition, 1.0);

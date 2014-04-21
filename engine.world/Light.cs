@@ -20,17 +20,17 @@ namespace engine.world
         public Vector3 Diffuse { get; set; }
     }
 
-    public class SphereLight : Light
+    public class PointLight : Light
     {
-        private const string SphereMesh = "sphere2.obj";
+        private const string Mesh = "sphere3.obj";
 
-        public SphereLight(Vector3 specularity, Vector3 diffuse)
-            : base(SphereMesh, specularity, diffuse)
+        public PointLight(Vector3 specularity, Vector3 diffuse)
+            : base(Mesh, specularity, diffuse)
         {
         }
 
-        public SphereLight(Vector3 specularity, Vector3 diffuse, Vector3 position, Quaternion rotation, Vector3 scale)
-            : base(SphereMesh, specularity, diffuse, position, rotation, scale)
+        public PointLight(Vector3 specularity, Vector3 diffuse, Vector3 position, Quaternion rotation, Vector3 scale)
+            : base(Mesh, specularity, diffuse, position, rotation, scale)
         {
         }
     }

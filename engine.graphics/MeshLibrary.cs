@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using engine.data;
+using engine.world;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
@@ -16,6 +17,11 @@ namespace engine.graphics
     {
         public static readonly Dictionary<string, Mesh> Meshes = new Dictionary<string, Mesh>();
         private const string ModelPath = @"\..\..\Models\";
+
+        public static void AddMesh(Mesh mesh, string name)
+        {
+            Meshes[name] = mesh;
+        }
 
         public static Mesh GetMesh(string name)
         {
@@ -28,11 +34,6 @@ namespace engine.graphics
                         return LoadObjFile(name);
                 }
             return null;
-        }
-
-        public static void AddMesh(Mesh mesh, string name)
-        {
-            Meshes[name] = mesh;
         }
 
         #region From File

@@ -19,8 +19,9 @@ namespace engine.testificate
                 TextureLibrary.LoadTextureFromFile("alduin.jpg");
 
                 world.Entities.Add(new Entity("alduin.obj", "alduin.jpg"));
+                //world.Entities.Add(new FullScreenQuad("alduin.jpg") {Scale = Vector3.One / 1f});
 
-                world.Lights.Add(new SphereLight(Vector3.One, Vector3.One) {Scale = Vector3.One * 50});
+                world.Lights.Add(new PointLight(Vector3.One, Vector3.One) {Scale = Vector3.One * 50});
             };
 
             return world;

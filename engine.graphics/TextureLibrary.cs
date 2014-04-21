@@ -16,7 +16,8 @@ namespace engine.graphics
 
         public static bool HasTexture(string textureName)
         {
-            return Textures.ContainsKey(textureName);
+            int val;
+            return (int.TryParse(textureName, out val) && Textures.ContainsValue(val)) || Textures.ContainsKey(textureName);
         }
 
         public static void RegisterTexture(string name, int id)
@@ -26,7 +27,8 @@ namespace engine.graphics
 
         public static int GetTexture(string textureName)
         {
-            return HasTexture(textureName) ? Textures[textureName] : -1;
+            int val;
+            return int.TryParse(textureName, out val) ? val : HasTexture(textureName) ? Textures[textureName] : -1;
         }
 
         public static void LoadTextureFromFile(string filename)

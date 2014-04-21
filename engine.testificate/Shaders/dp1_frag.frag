@@ -2,11 +2,13 @@
 
 uniform sampler2D ObjectTexture;
 
-in Data {
+struct Data {
 	vec3 Position;
 	vec3 Normal;
 	vec2 Texture;
-} vdata;
+};
+
+in Data vdata;
 
 layout(location = 0) out vec4 Position;
 layout(location = 1) out vec4 Normal;
