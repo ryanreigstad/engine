@@ -8,6 +8,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 
+using CullFaceMode = OpenTK.Graphics.OpenGL.CullFaceMode;
 using GL1 = OpenTK.Graphics.OpenGL.GL;
 using EnableCap1 = OpenTK.Graphics.OpenGL.EnableCap;
 
@@ -15,6 +16,8 @@ namespace engine.graphics
 {
     public class Renderer
     {
+        private static readonly FullScreenQuad FullScreenQuad = new FullScreenQuad("");
+
         private const int PositionBuffer = 0;
         private const int NormalBuffer = 1;
         private const int TextureBuffer = 2;
@@ -34,8 +37,13 @@ namespace engine.graphics
             GL1.Enable(EnableCap1.VertexArray);
             GL1.Enable(EnableCap1.IndexArray);
 
-            // other misc
+            // depth
             GL.Enable(EnableCap.DepthTest);
+            //GL.DepthFunc(DepthFunction.Greater);
+
+            // culling
+            GL.Enable(EnableCap.CullFace);
+            GL.FrontFace(FrontFaceDirection.Ccw);
 
             GL.ClearColor(Color4.Black);
 
@@ -44,8 +52,12 @@ namespace engine.graphics
 
         private void InitShaders()
         {
+            // renders the position, normal, and texture data to 3 textures for further processing (1st pass)
             ShaderLibrary.LoadShader<ObjectShader>("deferred_pass1", "dp1_vert.vert", "dp1_frag.frag");
-            ShaderLibrary.LoadShader<LightingShader>("deferred_pass2", "dp2_vert.vert", "dp2_frag.frag");
+            // lighting (2nd pass)
+            ShaderLibrary.LoadShader<LightingShader>("deferred_pass2", "passthru.vert", "dp2_frag.frag");
+            // ui, is really simple for now, it inverts the color (2nd pass)
+            ShaderLibrary.LoadShader<OverlayShader>("deferred_ui", "passthru.vert", "dui.frag");
 
             ShaderLibrary.LoadShader<ObjectShader>("fallback", "vs.vert", "fs.frag");
 
@@ -98,13 +110,14 @@ namespace engine.graphics
             GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent16, _width, _height);
             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+            //GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
             Console.WriteLine("RenderBuffer = " + renderbuffer);
         }
 
         public void OnResize(int width, int height)
         {
             Projection = Matrix4.CreatePerspectiveFieldOfView(
-                (float) (Math.PI / 4.0f), (_width = width) / (float) (_height = height), 0.1f, 10000f);
+                (float) (Math.PI / 4.0f), (_width = width) / (float) (_height = height), 0.1f, 80000f);
         }
 
         public void OnRender(World world)
@@ -122,6 +135,7 @@ namespace engine.graphics
             //    s.UpdateUniforms(view, entity);
             //    RenderMesh(MeshLibrary.GetMesh(entity.MeshName));
             //}
+            //s.Unbind();
             //return;
             // END TEST
 
@@ -145,22 +159,10 @@ namespace engine.graphics
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             // TODO: blitting is slow (er than a fullscreen quad)
-            GL.BlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
-
-            // TEST DEFERRED BUFFERS (no lights)
-            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
-            //s.Bind();
-            //var q = new FullScreenQuad("" + _frameBufferTextures[NormalBuffer]);          // change the buffer to see a different one
-            //s.UpdateUniforms(view, q);
-            //RenderMesh(MeshLibrary.GetMesh(q.MeshName));
-            //return;
-            // END TEST
-
-            // LIGHT PASS
-            var ls = ShaderLibrary.GetShader<LightingShader>("deferred_pass2");
-            ls.Bind();
+            //GL.BlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+            os.Unbind();
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[PositionBuffer]);
@@ -169,10 +171,20 @@ namespace engine.graphics
             GL.ActiveTexture(TextureUnit.Texture2);
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer]);
 
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
-            GL.Disable(EnableCap.DepthTest);
-            GL.DepthMask(false);
+            // TEST DEFERRED BUFFERS (no lights)
+            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
+            //s.Bind();
+            //RenderQuad(s, view, "1");          // change the buffer to see a different one (pos = 0, normal = 1, texture)
+            //s.Unbind();
+            //return;
+            // END TEST
+
+            // TODO: maybe make these pass their own textures and have 3 stage deferred lighting.
+            //          benefit: we can use the data later in the pipeline and do some potentially cool stuff
+            //          con: memory, maybe fps (doubt it, depends on geometry)
+            // LIGHT PASS
+            var ls = ShaderLibrary.GetShader<LightingShader>("deferred_pass2");
+            ls.Bind();
 
             var lights = world.Lights;
             foreach (var light in Cull(lights))
@@ -180,11 +192,13 @@ namespace engine.graphics
                 ls.UpdateUniforms(view, light);
                 RenderMesh(MeshLibrary.GetMesh(light.MeshName));
             }
+            ls.Unbind();
 
-            GL.Disable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
-            GL.Enable(EnableCap.DepthTest);
-            GL.DepthMask(true);
+            // UI PASS
+            var uis = ShaderLibrary.GetShader<OverlayShader>("deferred_ui");
+            uis.Bind();
+            RenderQuad(uis, view);
+            uis.Unbind();
         }
 
         private void RenderMesh(Mesh mesh)
@@ -205,6 +219,16 @@ namespace engine.graphics
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+        }
+
+        /// <summary>
+        /// Use for shaders that just need a fullscreen quad and do everything in the shaders
+        /// </summary>
+        private void RenderQuad(Shader s, Matrix4 view, string texture = "")
+        {
+            FullScreenQuad.TextureName = texture;
+            s.UpdateUniforms(view, FullScreenQuad);
+            RenderMesh(MeshLibrary.GetMesh(FullScreenQuad.MeshName));
         }
 
         private List<Entity> GetDeferredRenderableEntities(List<Entity> source)

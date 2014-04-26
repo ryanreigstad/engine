@@ -77,15 +77,16 @@ namespace engine
             }
 
             // move speed
+            const float dv = 0.01f;
             if (keys[InputConfig.MoveFaster])
             {
-                _velocity += 0.01f;
+                _velocity *= (1 + dv);
             }
             if (keys[InputConfig.MoveSlower])
             {
-                _velocity -= 0.01f;
-                if (_velocity < 0)
-                    _velocity = 0;
+                _velocity *= (1 - dv);
+                if (_velocity < dv)
+                    _velocity = dv;
             }
         }
     }

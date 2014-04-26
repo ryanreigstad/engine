@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq.Expressions;
 
 using engine.world;
 
@@ -60,9 +63,18 @@ namespace engine.graphics
         {
         }
 
-        public void Bind()
+        public virtual void Bind()
         {
             GL.UseProgram(ProgramId);
+        }
+
+        public virtual void UpdateUniforms(Matrix4 view, Entity entity)
+        {
+        }
+
+        public virtual void Unbind()
+        {
+            // GL.UseProgram(0);        <-- no.
         }
     }
 
@@ -89,7 +101,7 @@ namespace engine.graphics
             _texture = GL.GetUniformLocation(ProgramId, Texture);
         }
 
-        public void UpdateUniforms(Matrix4 view, Entity entity)
+        public override void UpdateUniforms(Matrix4 view, Entity entity)
         {
             if (_viewMatrix >= 0)
                 GL.UniformMatrix4(_viewMatrix, false, ref view);
@@ -133,10 +145,10 @@ namespace engine.graphics
         private const string NormalTexture = "NormalTexture";
         private const string TextureTexture = "TextureTexture";
 
+        private int _viewMatrix;
         private int _modelMatrix;
         private int _modelRotationMatrix;
         private int _modelViewMatrix;
-        private int _viewMatrix;
         private int _lightSpecularity;
         private int _lightDiffuse;
         private int _lightPosition;
@@ -159,6 +171,22 @@ namespace engine.graphics
             _normalTexture = GL.GetUniformLocation(ProgramId, NormalTexture);
             _textureTexture = GL.GetUniformLocation(ProgramId, TextureTexture);
             Console.WriteLine("compile: " + PositionTexture + " = " + _positionTexture + "; " + NormalTexture + " = " + _normalTexture + "; " + TextureTexture + " = " + _textureTexture);
+        }
+
+        public override void Bind()
+        {
+            base.Bind();
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+            GL.Disable(EnableCap.DepthTest);
+            GL.DepthMask(false);
+        }
+
+        public override void UpdateUniforms(Matrix4 view, Entity entity)
+        {
+            if (entity is Light)
+                UpdateUniforms(view, (Light) entity);
         }
 
         public void UpdateUniforms(Matrix4 view, Light light)
@@ -195,6 +223,81 @@ namespace engine.graphics
                 GL.Uniform1(_normalTexture, 1);
             if (_textureTexture >= 0)
                 GL.Uniform1(_textureTexture, 2);
+        }
+
+        public override void Unbind()
+        {
+            base.Unbind();
+
+            GL.Disable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthMask(true);
+        }
+    }
+
+    public class OverlayShader : Shader
+    {
+        private const string ViewMatrix = "ViewMatrix";
+        private const string ModelMatrix = "ModelMatrix";
+        private const string ModelRotationMatrix = "ModelRotationMatrix";
+        private const string ModelViewMatrix = "ModelViewMatrix";
+        private const string ColorTexture = "ColorTexture";
+
+        private int _viewMatrix;
+        private int _modelMatrix;
+        private int _modelRotationMatrix;
+        private int _modelViewMatrix;
+        private int _colorTexture;
+
+        protected override void OnCompile()
+        {
+            _viewMatrix = GL.GetUniformLocation(ProgramId, ViewMatrix);
+            _modelMatrix = GL.GetUniformLocation(ProgramId, ModelMatrix);
+            _modelRotationMatrix = GL.GetUniformLocation(ProgramId, ModelRotationMatrix);
+            _modelViewMatrix = GL.GetUniformLocation(ProgramId, ModelViewMatrix);
+            _colorTexture = GL.GetUniformLocation(ProgramId, ColorTexture);
+        }
+
+        public override void Bind()
+        {
+            base.Bind();
+
+            GL.Disable(EnableCap.DepthTest);
+            GL.DepthMask(false);
+        }
+
+        public override void UpdateUniforms(Matrix4 view, Entity entity)
+        {
+            if (_viewMatrix >= 0)
+                GL.UniformMatrix4(_viewMatrix, false, ref view);
+            if (_modelMatrix >= 0)
+            {
+                var t = entity.Transform;
+                GL.UniformMatrix4(_modelMatrix, false, ref t);
+            }
+            if (_modelRotationMatrix >= 0)
+            {
+                var t = entity.RotationMatrix;
+                GL.UniformMatrix4(_modelRotationMatrix, false, ref t);
+            }
+            if (_modelViewMatrix >= 0)
+            {
+                var modelView = entity.Transform;
+                if (!(entity is FullScreenQuad))
+                    modelView *= view;
+                GL.UniformMatrix4(_modelViewMatrix, false, ref modelView);
+            }
+            if (_colorTexture >= 0)
+                GL.Uniform1(_colorTexture, 2);
+        }
+
+        public override void Unbind()
+        {
+            base.Unbind();
+
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthMask(true);
         }
     }
 }

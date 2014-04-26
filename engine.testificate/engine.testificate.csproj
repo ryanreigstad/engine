@@ -67,7 +67,8 @@
     <None Include="Shaders\dp1_frag.frag" />
     <None Include="Shaders\dp1_vert.vert" />
     <None Include="Shaders\dp2_frag.frag" />
-    <None Include="Shaders\dp2_vert.vert" />
+    <None Include="Shaders\dui.frag" />
+    <None Include="Shaders\passthru.vert" />
     <None Include="Shaders\fragmentshader.sh" />
     <None Include="Shaders\fragmentshader1.sh" />
     <None Include="Shaders\fs.frag" />

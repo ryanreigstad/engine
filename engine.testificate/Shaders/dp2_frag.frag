@@ -12,11 +12,11 @@ uniform vec3 LightDiffuse;
 
 out vec4 FragColor;
 
+const vec2 screensize = vec2(1600, 900);
 void main () {
-// todo: real screen cords
   vec2 ss;
-  ss.s = gl_FragCoord.x / 1600.0;
-  ss.t = gl_FragCoord.y / 900.0;
+  ss.s = gl_FragCoord.x / screensize.x;
+  ss.t = gl_FragCoord.y / screensize.y;
 
   vec4 position = texture (PositionTexture, ss);
   vec4 normal = texture (NormalTexture, ss);
