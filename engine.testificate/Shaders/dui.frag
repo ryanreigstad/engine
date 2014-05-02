@@ -6,7 +6,7 @@ out vec4 FragColor;
 
 const vec2 screensize = vec2(1600, 900);
 void main () {
-	if (distance(vec2(gl_FragCoord.x, gl_FragCoord.y), vec2(screensize.x, screensize.y) / 2.0) > 400)
+	if (distance(vec2(gl_FragCoord.x, gl_FragCoord.y), vec2(screensize.x, screensize.y) / 2.0) > 100)
 		discard;
 
 	vec2 ss;

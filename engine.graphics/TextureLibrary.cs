@@ -14,10 +14,15 @@ namespace engine.graphics
     {
         public static readonly Dictionary<string, int> Textures = new Dictionary<string, int>();
 
+        private static bool HasNamedTexture(string textureName)
+        {
+            return Textures.ContainsKey(textureName);
+        }
+
         public static bool HasTexture(string textureName)
         {
             int val;
-            return (int.TryParse(textureName, out val) && Textures.ContainsValue(val)) || Textures.ContainsKey(textureName);
+            return int.TryParse(textureName, out val) || HasNamedTexture(textureName);
         }
 
         public static void RegisterTexture(string name, int id)
@@ -28,7 +33,7 @@ namespace engine.graphics
         public static int GetTexture(string textureName)
         {
             int val;
-            return int.TryParse(textureName, out val) ? val : HasTexture(textureName) ? Textures[textureName] : -1;
+            return int.TryParse(textureName, out val) ? val : HasNamedTexture(textureName) ? Textures[textureName] : -1;
         }
 
         public static void LoadTextureFromFile(string filename)

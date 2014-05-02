@@ -15,8 +15,6 @@ out Data {
 	vec2 Texture;
 } vdata;
 
-uniform sampler2D Texture;
-
 void main()
 {
 	vec4 p = ModelViewMatrix * vec4(vPosition, 1.0);

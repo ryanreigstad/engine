@@ -27,6 +27,7 @@ namespace engine.graphics
         public Matrix4 Projection { get; set; }
 
         private int _frameBuffer;
+        private int _renderBuffer;
         private int[] _frameBufferTextures;
         private int _width = 1600;
         private int _height = 900;
@@ -39,7 +40,7 @@ namespace engine.graphics
 
             // depth
             GL.Enable(EnableCap.DepthTest);
-            //GL.DepthFunc(DepthFunction.Greater);
+            GL.DepthFunc(DepthFunction.Gequal);
 
             // culling
             GL.Enable(EnableCap.CullFace);
@@ -105,13 +106,12 @@ namespace engine.graphics
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment2, TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer], 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 
-            var renderbuffer = GL.GenRenderbuffer();
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderbuffer);
-            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent16, _width, _height);
-            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
+            _renderBuffer = GL.GenRenderbuffer();
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _renderBuffer);
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent32f, _width, _height);
+            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, _renderBuffer);
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
-            //GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
-            Console.WriteLine("RenderBuffer = " + renderbuffer);
+            Console.WriteLine("RenderBuffer = " + _renderBuffer);
         }
 
         public void OnResize(int width, int height)
@@ -139,7 +139,7 @@ namespace engine.graphics
             //return;
             // END TEST
 
-            // ENTITY PASS
+            // ENTITY PASS (PASS 1)
             var os = ShaderLibrary.GetShader<ObjectShader>("deferred_pass1");
             os.Bind();
 
@@ -147,6 +147,7 @@ namespace engine.graphics
             var deferrable = GetDeferredRenderableEntities(entities);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBuffer);
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _renderBuffer);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.DrawBuffers(3, new[] { DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1, DrawBuffersEnum.ColorAttachment2, });
@@ -155,29 +156,26 @@ namespace engine.graphics
                 os.UpdateUniforms(view, entity);
                 RenderMesh(MeshLibrary.GetMesh(entity.MeshName));
             }
-            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _frameBuffer);
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            // TODO: blitting is slow (er than a fullscreen quad)
-            //GL.BlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
             os.Unbind();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            // TEST DEFERRED BUFFERS (no lights)
+            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
+            //s.Bind();
+            //RenderQuad(s, view, "smiley.png");// "" + _frameBufferTextures[PositionBuffer]);          // change the buffer to see a different one (pos = 0, normal = 1, texture)
+            //s.Unbind();
+            //return;
+            // END TEST
+
+            // BEGIN PASS 2
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[PositionBuffer]);
             GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[NormalBuffer]);
             GL.ActiveTexture(TextureUnit.Texture2);
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer]);
-
-            // TEST DEFERRED BUFFERS (no lights)
-            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
-            //s.Bind();
-            //RenderQuad(s, view, "1");          // change the buffer to see a different one (pos = 0, normal = 1, texture)
-            //s.Unbind();
-            //return;
-            // END TEST
 
             // TODO: maybe make these pass their own textures and have 3 stage deferred lighting.
             //          benefit: we can use the data later in the pipeline and do some potentially cool stuff
@@ -224,7 +222,7 @@ namespace engine.graphics
         /// <summary>
         /// Use for shaders that just need a fullscreen quad and do everything in the shaders
         /// </summary>
-        private void RenderQuad(Shader s, Matrix4 view, string texture = "")
+        private void RenderQuad(Shader s, Matrix4 view, string texture = "0")
         {
             FullScreenQuad.TextureName = texture;
             s.UpdateUniforms(view, FullScreenQuad);
