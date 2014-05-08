@@ -27,7 +27,7 @@ namespace engine.graphics
         public Matrix4 Projection { get; set; }
 
         private int _frameBuffer;
-        private int _renderBuffer;
+        private int _depthBuffer;
         private int[] _frameBufferTextures;
         private int _width = 1600;
         private int _height = 900;
@@ -40,7 +40,7 @@ namespace engine.graphics
 
             // depth
             GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Gequal);
+            GL.DepthFunc(DepthFunction.Lequal);
 
             // culling
             GL.Enable(EnableCap.CullFace);
@@ -98,20 +98,23 @@ namespace engine.graphics
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             Console.WriteLine("TextureBuffer = " + _frameBufferTextures[TextureBuffer]);
 
+            _depthBuffer = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, _depthBuffer);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R16f, _width, _height, 0, PixelFormat.Red, PixelType.Float, (IntPtr)0);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            Console.WriteLine("Depth Buffer = " + _depthBuffer);
+
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBuffer);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, _frameBufferTextures[PositionBuffer], 0);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment1, TextureTarget.Texture2D, _frameBufferTextures[NormalBuffer], 0);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment2, TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer], 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.Depth, TextureTarget.Texture2D, _depthBuffer, 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-
-            _renderBuffer = GL.GenRenderbuffer();
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _renderBuffer);
-            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent32f, _width, _height);
-            GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, _renderBuffer);
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
-            Console.WriteLine("RenderBuffer = " + _renderBuffer);
         }
 
         public void OnResize(int width, int height)
@@ -147,7 +150,6 @@ namespace engine.graphics
             var deferrable = GetDeferredRenderableEntities(entities);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBuffer);
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _renderBuffer);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.DrawBuffers(3, new[] { DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1, DrawBuffersEnum.ColorAttachment2, });
@@ -158,15 +160,14 @@ namespace engine.graphics
             }
             os.Unbind();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // TEST DEFERRED BUFFERS (no lights)
-            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
-            //s.Bind();
-            //RenderQuad(s, view, "smiley.png");// "" + _frameBufferTextures[PositionBuffer]);          // change the buffer to see a different one (pos = 0, normal = 1, texture)
-            //s.Unbind();
-            //return;
+            var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
+            s.Bind();
+            RenderQuad(s, view, "" + _frameBufferTextures[PositionBuffer]);          // change the buffer to see a different one (pos = 0, normal = 1, texture)
+            s.Unbind();
+            return;
             // END TEST
 
             // BEGIN PASS 2
