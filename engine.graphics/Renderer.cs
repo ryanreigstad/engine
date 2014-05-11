@@ -21,19 +21,20 @@ namespace engine.graphics
         private const int PositionBuffer = 0;
         private const int NormalBuffer = 1;
         private const int TextureBuffer = 2;
-        private const int DiffuseBuffer = -1; // TODO: this is for ambient occlusion data (i think)
+        private const int DepthBuffer = 3;
         // todo: edge detection buffer, etc
 
         public Matrix4 Projection { get; set; }
 
         private int _frameBuffer;
-        private int _depthBuffer;
         private int[] _frameBufferTextures;
         private int _width = 1600;
         private int _height = 900;
 
         public void OnLoad()
         {
+            Console.WriteLine("OpenGL Version: {0}", GL.GetString(StringName.Version));
+
             // vbo
             GL1.Enable(EnableCap1.VertexArray);
             GL1.Enable(EnableCap1.IndexArray);
@@ -47,6 +48,7 @@ namespace engine.graphics
             GL.FrontFace(FrontFaceDirection.Ccw);
 
             GL.ClearColor(Color4.Black);
+            GL.ClearDepth(1);
 
             InitShaders();
         }
@@ -63,13 +65,15 @@ namespace engine.graphics
             ShaderLibrary.LoadShader<ObjectShader>("fallback", "vs.vert", "fs.frag");
 
             InitDeferredRendering();
+
+            CheckForErrors("End Init");
         }
 
         private void InitDeferredRendering()
         {
             _frameBuffer = GL.GenFramebuffer();
             Console.WriteLine("FrameBuffer = " + _frameBuffer);
-            _frameBufferTextures = new int[3];
+            _frameBufferTextures = new int[4];
 
             _frameBufferTextures[PositionBuffer] = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[PositionBuffer]);
@@ -79,6 +83,7 @@ namespace engine.graphics
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             Console.WriteLine("PositionBuffer = " + _frameBufferTextures[PositionBuffer]);
+            CheckForErrors("Made Position Buffer");
 
             _frameBufferTextures[NormalBuffer] = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[NormalBuffer]);
@@ -88,6 +93,7 @@ namespace engine.graphics
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             Console.WriteLine("NormalBuffer = " + _frameBufferTextures[NormalBuffer]);
+            CheckForErrors("Made Normal Buffer");
 
             _frameBufferTextures[TextureBuffer] = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer]);
@@ -97,15 +103,17 @@ namespace engine.graphics
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             Console.WriteLine("TextureBuffer = " + _frameBufferTextures[TextureBuffer]);
+            CheckForErrors("Made Texture Buffer");
 
-            _depthBuffer = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, _depthBuffer);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R16f, _width, _height, 0, PixelFormat.Red, PixelType.Float, (IntPtr)0);
+            _frameBufferTextures[DepthBuffer] = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, _frameBufferTextures[DepthBuffer]);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Depth24Stencil8, _width, _height, 0, PixelFormat.DepthStencil, PixelType.UnsignedInt248, (IntPtr)0);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-            Console.WriteLine("Depth Buffer = " + _depthBuffer);
+            Console.WriteLine("Depth Buffer = " + _frameBufferTextures[DepthBuffer]);
+            CheckForErrors("Made Depth Buffer");
 
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
@@ -113,14 +121,15 @@ namespace engine.graphics
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, _frameBufferTextures[PositionBuffer], 0);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment1, TextureTarget.Texture2D, _frameBufferTextures[NormalBuffer], 0);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment2, TextureTarget.Texture2D, _frameBufferTextures[TextureBuffer], 0);
-            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.Depth, TextureTarget.Texture2D, _depthBuffer, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment, TextureTarget.Texture2D, _frameBufferTextures[DepthBuffer], 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            CheckForErrors("Setup Framebuffer");
         }
 
         public void OnResize(int width, int height)
         {
             Projection = Matrix4.CreatePerspectiveFieldOfView(
-                (float) (Math.PI / 4.0f), (_width = width) / (float) (_height = height), 0.1f, 80000f);
+                (float) (Math.PI / 4.0f), (_width = width) / (float) (_height = height), 1f, 20000f);
         }
 
         public void OnRender(World world)
@@ -163,11 +172,11 @@ namespace engine.graphics
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // TEST DEFERRED BUFFERS (no lights)
-            var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
-            s.Bind();
-            RenderQuad(s, view, "" + _frameBufferTextures[PositionBuffer]);          // change the buffer to see a different one (pos = 0, normal = 1, texture)
-            s.Unbind();
-            return;
+            //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
+            //s.Bind();
+            //RenderQuad(s, view, "" + _frameBufferTextures[DepthBuffer]);          // change the buffer to see a different one (pos = 0, normal = 1, texture)
+            //s.Unbind();
+            //return;
             // END TEST
 
             // BEGIN PASS 2
@@ -246,6 +255,15 @@ namespace engine.graphics
         {
             // TODO:
             return source;
+        }
+
+        private static void CheckForErrors(string context = null)
+        {
+            ErrorCode e;
+            while ((e = GL.GetError()) != ErrorCode.NoError)
+            {
+                Console.Error.WriteLine("\nError {0}{1}\n", e, !string.IsNullOrEmpty(context) ? string.Format("\n\tcontext = {0}", context) : "");
+            }
         }
     }
 }

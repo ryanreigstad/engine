@@ -16,11 +16,10 @@ namespace engine.testificate
             world.OnLoading += () =>
             {
                 TextureLibrary.LoadTextureFromFile("smiley.png");
-                TextureLibrary.LoadTextureFromFile("alduin.jpg");
-                MeshLibrary.LoadObjFile("alduin.obj");
 
-                world.Entities.Add(new Entity("alduin.obj", "alduin.jpg"));
-                //world.Entities.Add(new FullScreenQuad("3"));
+                MeshLibrary.LoadObjFile("serpentine city.obj");
+
+                world.Entities.Add(new Entity("serpentine city.obj", "smiley.png"));
 
                 world.Lights.Add(new AmbientLight(Vector3.One, Vector3.One));
             };

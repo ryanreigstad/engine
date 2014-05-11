@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 using OpenTK.Graphics.OpenGL;
 
@@ -12,7 +13,7 @@ namespace engine.graphics
 {
     public static class TextureLibrary
     {
-        public static readonly Dictionary<string, int> Textures = new Dictionary<string, int>();
+        private static readonly Dictionary<string, int> Textures = new Dictionary<string, int>();
 
         private static bool HasNamedTexture(string textureName)
         {
@@ -38,20 +39,17 @@ namespace engine.graphics
 
         public static void LoadTextureFromFile(string filename)
         {
-            if (!File.Exists(@"..\..\Textures\" + filename))
-            {
-                throw new Exception("missing texture file : " + @"..\..\Textures\" + filename);
-            }
+            var path = @"..\..\Textures\" + filename;
+            if (!File.Exists(path))
+                throw new Exception("missing texture file : " + path);
             if (HasTexture(filename))
-                throw new Exception("file already loaded");
+                return;
 
-            int textureId;
-            //generate one texture and put its ID number into the "Texture" variable
-            GL.GenTextures(1, out textureId);
+            var textureId = GL.GenTexture();
             RegisterTexture(filename, textureId);
 
             //make a bitmap out of the file on the disk
-            var textureBitmap = new Bitmap(@"..\..\Textures\" + filename);
+            var textureBitmap = new Bitmap(path);
 
             //get the data out of the bitmap
             var textureData =
