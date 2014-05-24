@@ -205,17 +205,19 @@ namespace engine.graphics
             }
             if (_modelViewMatrix >= 0)
             {
-                var modelView = light.Transform;
-                if (!(light is AmbientLight))
-                    modelView *= view;
+                Matrix4 modelView;
+                if (light is AmbientLight)
+                    modelView = (light as AmbientLight).Transform;
+                else
+                    modelView = light.Transform * view;
                 GL.UniformMatrix4(_modelViewMatrix, false, ref modelView);
             }
+            if (_lightPosition >= 0)
+                GL.Uniform3(_lightPosition, light.Position);
             if (_lightSpecularity >= 0)
                 GL.Uniform3(_lightSpecularity, light.Specularity);
             if (_lightDiffuse >= 0)
                 GL.Uniform3(_lightDiffuse, light.Diffuse);
-            if (_lightPosition >= 0)
-                GL.Uniform3(_lightPosition, light.Position);
 
             if (_positionTexture >= 0)
                 GL.Uniform1(_positionTexture, 0);

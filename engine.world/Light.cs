@@ -54,5 +54,12 @@ namespace engine.world
             MoveLocal(Vector3.UnitZ * -0.1f);
             RotateX((float)(Math.PI / 2.0f));
         }
+
+        private static readonly Matrix4 _transform = Matrix4.CreateRotationX((float) Math.PI / 2.0f)
+                                                     * Matrix4.CreateTranslation(Vector3.UnitZ * -0.1f);
+        public new Matrix4 Transform
+        {
+            get { return _transform; }
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace engine.testificate
 
                 world.Entities.Add(new Entity("serpentine city.obj", "smiley.png"));
 
-                world.Lights.Add(new AmbientLight(Vector3.One, Vector3.One));
+                world.Lights.Add(new AmbientLight(Vector3.One / 3f, Vector3.One / 3f) { Position = Vector3.UnitY * 100 });
             };
 
             return world;

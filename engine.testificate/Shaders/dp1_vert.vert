@@ -18,11 +18,9 @@ struct Data {
 out Data vdata;
 
 void main () {
-	vec4 p = ModelViewMatrix * vec4(vPosition, 1.0);
-
-	vdata.Position = vec3(p);
-	vdata.Normal = vec3(normalize(ModelRotationMatrix * vec4(vNormal, 1)));
+	vdata.Position = vPosition;
+	vdata.Normal = normalize(vNormal);
 	vdata.Texture = vTexture;
 
-	gl_Position = p;
+	gl_Position = ModelViewMatrix * vec4(vPosition, 1.0);
 }

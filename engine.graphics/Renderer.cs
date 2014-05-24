@@ -174,7 +174,7 @@ namespace engine.graphics
             // TEST DEFERRED BUFFERS (no lights)
             //var s = ShaderLibrary.GetShader<ObjectShader>("fallback");
             //s.Bind();
-            //RenderQuad(s, view, "" + _frameBufferTextures[DepthBuffer]);          // change the buffer to see a different one (pos = 0, normal = 1, texture)
+            //RenderQuad(s, view, "" + _frameBufferTextures[PositionBuffer]);          // change the buffer to see a different one (pos = 0, normal = 1, texture)
             //s.Unbind();
             //return;
             // END TEST
