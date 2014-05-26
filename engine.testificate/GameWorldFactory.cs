@@ -1,7 +1,6 @@
-﻿using System;
-
-using engine.graphics;
-using engine.world;
+﻿using engine.core;
+using engine.core.entities;
+using engine.core.resources;
 
 using OpenTK;
 

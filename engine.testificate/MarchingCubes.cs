@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
+using engine.core.resources;
 using engine.data;
-using engine.graphics;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
@@ -378,8 +378,8 @@ namespace engine.testificate
             }
 
             var ids = new[] {0, 0, 0};
-            ids[0] = BufferLibrary.CreateVertexBuffer(name + ":v", vertices.ToArray());
-            ids[1] = BufferLibrary.CreateIndexBuffer(name + ":i", indices.ToArray(), PrimitiveType.Triangles);
+            ids[0] = BufferLibrary.CreateVertexBuffer(name, vertices.ToArray());
+            ids[1] = BufferLibrary.CreateIndexBuffer(name, indices.ToArray(), PrimitiveType.Triangles);
 
             indexCount = indices.Count;
             return ids;

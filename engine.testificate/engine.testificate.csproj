@@ -49,11 +49,9 @@
     <Compile Include="Game.cs" />
     <Compile Include="GameWorldFactory.cs" />
     <Compile Include="MarchingCubes.cs" />
-    <Compile Include="PrimitiveFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TerrainManager.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -69,29 +67,29 @@
     <None Include="Shaders\dp2_frag.frag" />
     <None Include="Shaders\dui.frag" />
     <None Include="Shaders\passthru.vert" />
-    <None Include="Shaders\fragmentshader.sh" />
-    <None Include="Shaders\fragmentshader1.sh" />
-    <None Include="Shaders\fs.frag" />
-    <None Include="Shaders\vertexshader.sh" />
-    <None Include="Shaders\vertexshader1.sh" />
-    <None Include="Shaders\vs.vert" />
+    <None Include="Shaders\simple.frag" />
+    <None Include="Shaders\simple.vert" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Textures\alduin.jpg" />
     <Content Include="Textures\smiley.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\engine.core\engine.core.csproj">
+      <Project>{F3E12DE2-CAFE-4BFA-96D0-D0CC6B115931}</Project>
+      <Name>engine.core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\engine.data\engine.data.csproj">
-      <Project>{E79F0B7A-DCCF-4253-93BA-CFF49818AF67}</Project>
+      <Project>{17A3E3BE-4FA0-47D4-BEF8-ABAD51919FC1}</Project>
       <Name>engine.data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\engine.graphics\engine.graphics.csproj">
-      <Project>{BCE02091-C018-4502-A278-3EE283966794}</Project>
-      <Name>engine.graphics</Name>
+    <ProjectReference Include="..\engine.io\engine.io.csproj">
+      <Project>{ACB5D2ED-E1B4-4834-89F5-F77C8D1D848F}</Project>
+      <Name>engine.io</Name>
     </ProjectReference>
-    <ProjectReference Include="..\engine.world\engine.world.csproj">
-      <Project>{4F8EF283-8930-4B8C-A13B-9914099A3D72}</Project>
-      <Name>engine.world</Name>
+    <ProjectReference Include="..\engine.util\engine.util.csproj">
+      <Project>{D6823D8A-FA1B-47FE-9129-13CBF4685316}</Project>
+      <Name>engine.util</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

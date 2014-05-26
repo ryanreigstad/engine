@@ -1,7 +1,6 @@
 ﻿using System;
 
 using engine.data;
-using engine.world;
 
 using OpenTK;
 using OpenTK.Input;
@@ -10,6 +9,9 @@ using SimplexNoise;
 
 namespace engine.testificate
 {
+    /// <summary>
+    /// TODO: Compute Shader
+    /// </summary>
     public static class FlatTerrainFactory
     {
         public const int ChunkHeight = 64;
@@ -17,7 +19,7 @@ namespace engine.testificate
 
         private const double NoiseStep = 0.01d;
         private static readonly Random Random = new Random();
-        public static readonly Vector2i ChunkSize = new Vector2i {X = 32, Y = 32};
+        public static readonly Vector2i ChunkSize = new Vector2i(32, 32);
         private static readonly Vector3d NoiseLocation;
 
         static FlatTerrainFactory()
@@ -109,7 +111,7 @@ namespace engine.testificate
         }
     }
 
-    public class TerrainManager : Mechanic
+    public class TerrainManager
     {
         //public TerrainManager(Vector3 position, Quaternion rotation, Vector3 scale)
         //    : base(position, rotation, scale)
@@ -119,7 +121,7 @@ namespace engine.testificate
         //private readonly Dictionary<Vector2i, VboEntity> _chunks = new Dictionary<Vector2i, VboEntity>();
         //private Vector2i _cameraChunk;
 
-        public override void OnUpdate(KeyboardState keyboard, MouseState mouse)
+        public void OnUpdate(KeyboardState keyboard, MouseState mouse)
         {
             //    // TODO:
             //    //_cameraChunk = new Vector2i
@@ -165,11 +167,5 @@ namespace engine.testificate
         //{
         //    return _chunks.ContainsKey(i);
         //}
-    }
-
-    public struct Vector2i
-    {
-        public int X;
-        public int Y;
     }
 }

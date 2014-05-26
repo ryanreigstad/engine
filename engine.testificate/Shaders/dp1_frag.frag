@@ -1,5 +1,7 @@
 ﻿#version 440
 
+in vec2 gl_FragCoord;
+
 uniform sampler2D ObjectTexture;
 
 struct Data {

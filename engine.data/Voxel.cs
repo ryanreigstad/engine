@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-using OpenTK;
+﻿using OpenTK;
 
 namespace engine.data
 {
