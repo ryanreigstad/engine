@@ -33,9 +33,11 @@ namespace engine.data.config
             File = file;
         }
 
+        [field: JsonIgnore]
         public event OnConfigChanged OnChanged;
-        public bool Changed { get; set; }
-        public FileInfo File { get; set; }
+
+        [JsonIgnore] public bool Changed;
+        [JsonIgnore] public FileInfo File;
 
         public void Commit()
         {

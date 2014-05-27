@@ -27,6 +27,7 @@ namespace engine.data.config
 
         [field: JsonIgnore]
         public event OnConfigChanged OnChanged;
+
         [JsonIgnore] public bool Changed;
 
         public void Commit()
