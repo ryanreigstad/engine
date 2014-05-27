@@ -11,7 +11,7 @@ namespace engine.data
     {
         private const string FilepathFormat = @"{0}{1}\{2}";
 
-        private const string ConfigPath = @"\..\..";
+        private const string ConfigPath = @"\..\..\..\Configs";
         private const string ModelsPath = @"\..\..\Models";
         private const string TexturesPath = @"\..\..\Textures";
         private const string ShadersPath = @"\..\..\Shaders";

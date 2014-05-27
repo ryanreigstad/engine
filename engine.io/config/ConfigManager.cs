@@ -1,15 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.IO;
 using engine.data.config;
 using engine.io.serializers;
+using engine.util;
 
 namespace engine.io.config
 {
     /// <summary>
-    /// A slimmed down version of <see cref="SingletonConfigManager"/> not meant for singletons.
-    /// Read that for details and everything here will make sense.
+    /// A slimmed down version of <see cref="SingletonConfigManager"/> meant for nonsingletons.
+    /// Read that for details and everything here will make sense. (I wrote that first, the comments are better)
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public static class ConfigManager<T>
@@ -19,22 +17,8 @@ namespace engine.io.config
         {
             var t = JsonSerialization.LoadJson<T>(file);
             t.File = file;
-            return MergeDefaultConfig(t);
-        }
-
-        private static T MergeDefaultConfig(T instance)
-        {
-            var unset = typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(f => f.GetValue(instance).Equals(f.FieldType.IsValueType ? Activator.CreateInstance(f.FieldType) : null)).ToList();
-            if (unset.Count == 0)
-                return instance;
-
-            var defaultt = instance.GetDefaults(instance.File);
-            foreach (var field in unset)
-                field.SetValue(instance, field.GetValue(defaultt));
-
-            SaveConfig(instance, true);
-            return instance;
+            ReflectionUtils.Merge(t, t.GetDefaults(file), true, false);
+            return t;
         }
 
         public static void SaveConfig(T config, bool force = false)

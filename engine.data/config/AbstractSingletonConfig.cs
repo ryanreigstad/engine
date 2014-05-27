@@ -5,6 +5,7 @@ using engine.data.exceptions;
 using engine.data.exceptions.logging;
 using engine.util.extensions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace engine.data.config
 {
@@ -24,8 +25,9 @@ namespace engine.data.config
             OnChanged -= OnChangeNotified;
         }
 
+        [field: JsonIgnore]
         public event OnConfigChanged OnChanged;
-        public bool Changed { get; set; }
+        [JsonIgnore] public bool Changed;
 
         public void Commit()
         {

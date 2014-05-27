@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -6,13 +7,14 @@ using engine.data;
 using engine.data.config;
 using engine.data.exceptions;
 using engine.io.serializers;
+using engine.util;
 using engine.util.extensions;
 
 namespace engine.io.config
 {
     public static class SingletonConfigManager
     {
-        private static Type[] _singletonConfigTypes;
+        private static List<Type> _singletonConfigTypes;
 
         /// <summary>
         /// Loads the Config Types by looking at every loaded class.
@@ -60,48 +62,34 @@ namespace engine.io.config
         /// </summary>
         public static void ReadConfigTypes()
         {
-            _singletonConfigTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).Where(t => t.IsSubclassOf(typeof(AbstractSingletonConfig))).ToArray();
+            _singletonConfigTypes = ReflectionUtils.GetSubclasses<AbstractSingletonConfig>().ToList();
         }
 
         #region Load Config
-
-        /// <summary>
-        /// Finds any empty fields in the current config instance and assigns the value from GetDefaultInstance().
-        /// </summary>
-        /// <param name="t">The config type to perform the merge for.</param>
-        /// <remarks>Will only merge top level configurations at the moment.</remarks>
-        private static void MergeDefaultConfig(Type t)
-        {
-            var instance = Get_Instance(t);
-
-            var unset = t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(f => f.GetValue(instance).Equals(f.FieldType.IsValueType ? Activator.CreateInstance(f.FieldType) : null)).ToList();
-            if (unset.Count == 0)
-                return;
-
-            var defaultt = Invoke_GetDefaultInstance(t);
-            foreach (var field in unset)
-                field.SetValue(instance, field.GetValue(defaultt));
-
-            SaveConfig(Filepaths.GetConfigFileInfo(Get_Filename(t)), instance, true);
-        }
 
         /// <summary>
         /// Loads and merges the default values or creates the file from the default values if it doesn't exist.
         /// </summary>
         /// <param name="file">The file to load/create.</param>
         /// <param name="t">The config type.</param>
-        private static void LoadConfig(FileInfo file, Type t)
+        /// <param name="overwrite">Whether to overwrite the current config instance if it exists.</param>
+        private static void LoadConfig(FileInfo file, Type t, bool overwrite)
         {
-            if (file.Exists)
+            var inst = Get_Instance(t);
+            if ((overwrite && inst != null) || inst == null)
             {
-                Set_Instance(t, (AbstractSingletonConfig) JsonSerialization.LoadJson(file, t));
-                MergeDefaultConfig(t);
-            }
-            else
-            {
-                Set_Instance(t, Invoke_GetDefaultInstance(t));
-                SaveConfig(file, Get_Instance(t));
+                if (file.Exists)
+                {
+                    var config = (AbstractSingletonConfig) JsonSerialization.LoadJson(file, t);
+                    ReflectionUtils.Merge(t, config, Invoke_GetDefaultInstance(t), true, false);
+                    Set_Instance(t, config);
+                }
+                else if (!file.Exists)
+                {
+                    var config = Invoke_GetDefaultInstance(t);
+                    Set_Instance(t, config);
+                    SaveConfig(file, config, true);
+                }
             }
         }
 
@@ -109,27 +97,30 @@ namespace engine.io.config
         /// Load a config file based on the supplied type.
         /// </summary>
         /// <param name="t">Type of the config file to load.</param>
-        public static void LoadConfig(Type t)
+        /// <param name="overwrite">Whether to overwrite the current config instance if it exists.</param>
+        public static void LoadConfig(Type t, bool overwrite = true)
         {
-            LoadConfig(Filepaths.GetConfigFileInfo(Get_Filename(t)), t);
+            LoadConfig(Filepaths.GetConfigFileInfo(Get_Filename(t)), t, overwrite);
         }
 
         /// <summary>
         /// Load a config file based on the supplied type.
         /// </summary>
         /// <typeparam name="T">Type of the config file to load.</typeparam>
-        public static void LoadConfig<T>()
+        /// <param name="overwrite">Whether to overwrite the current config instance if it exists.</param>
+        public static void LoadConfig<T>(bool overwrite = true)
             where T : AbstractSingletonConfig
         {
-            LoadConfig(typeof (T));
+            LoadConfig(typeof (T), overwrite);
         }
 
         /// <summary>
-        /// Load all the known singleton config types.
+        /// Reads and then loads all the singleton config types in loaded assemblies.
         /// </summary>
         public static void LoadAll()
         {
-            _singletonConfigTypes.ToList().ForEach(LoadConfig);
+            ReadConfigTypes();
+            _singletonConfigTypes.ToList().ForEach(config => LoadConfig(config, false));
         }
 
         #endregion
@@ -181,13 +172,13 @@ namespace engine.io.config
         #region Shitty Reflection Utils
 
         /// <summary>
-        /// Gets the static 'Filename' from the config type.
+        /// Gets the 'Filename' from the config type.
         /// </summary>
         /// <param name="t">The config type.</param>
         /// <returns>The string Filename.</returns>
         private static string Get_Filename(Type t)
         {
-            return (string) t.GetField("Filename", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            return (string) t.GetField("Filename", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
         }
 
         /// <summary>
@@ -197,17 +188,17 @@ namespace engine.io.config
         /// <returns>The current Instance of the config object.</returns>
         private static AbstractSingletonConfig Get_Instance(Type t)
         {
-            return (AbstractSingletonConfig) t.GetField("_instance", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            return (AbstractSingletonConfig) t.GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
         }
 
         /// <summary>
-        /// Sets the value of the currect config '_instance' for the config type.
+        /// Sets the value of the current config '_instance' for the config type.
         /// </summary>
         /// <param name="t">The config type.</param>
         /// <param name="value">The value to set.</param>
         private static void Set_Instance(Type t, AbstractSingletonConfig value)
         {
-            t.GetField("_instance", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, value);
+            t.GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, value);
         }
 
         /// <summary>
@@ -217,7 +208,7 @@ namespace engine.io.config
         /// <returns>The default config object</returns>
         private static AbstractSingletonConfig Invoke_GetDefaultInstance(Type t)
         {
-            return (AbstractSingletonConfig) t.GetMethod("GetDefaultInstance", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[0]);
+            return (AbstractSingletonConfig) t.GetMethod("GetDefaultInstance", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[0]);
         }
 
         #endregion
